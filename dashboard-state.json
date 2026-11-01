@@ -1,0 +1,665 @@
+{
+  "version": 1,
+  "revision": 11,
+  "updated_at": "2026-10-31T21:44:08Z",
+  "project": {
+    "title": "Redshift calibration task force",
+    "summary": "Prepare robust Euclid DR1 redshift distributions and prior uncertainties for weak lensing, galaxy clustering and 2D mass mapping. Compare real data, Flagship2 and SHECAL; validate calibration-sample coverage, transfer functions and the shift-and-stretch uncertainty model.",
+    "snapshot": "2026-10-31",
+    "target": "2026-11-30",
+    "target_note": "First estimate of DR1 N(z) prior uncertainties expected by end of November 2026. 30 November is a dashboard interpretation of the month-end target, not a separately confirmed delivery date.",
+    "caveats": "Initial statuses reflect reports through October 2026, not live confirmations. Owners of proposed actions are suggestions unless explicitly reported. Summary dates are approximate, some threads were not read in full, and contributor totals are approximate. Personnel.txt contains names but no role descriptions. Roles here use Project_Activity.txt and technical reports, not inferred sentiment. Source spelling varies (e.g. Anna Poredon / Porredon and Olivier Illbert / Ilbert); roster spellings are retained. Channel rankings differ from the TSV (notably Marc Manera and rank 10); activity figures below use the TSV and are not a measure of responsibility or performance."
+  },
+  "workstreams": [
+    {
+      "title": "Define the DR1 prior-uncertainty plan",
+      "owner": "Angus Wright",
+      "status": "In progress",
+      "priority": "High",
+      "due": "2026-11-16",
+      "evidence": "Reported",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "detail": "Set the overall plan for forward-propagating uncertainty through SOMs into N(z) realisations and final priors. Resolve how simulation and real-data constraints enter without double counting; decide North/South treatment and the number of realisations. November target is reported, delivery not confirmed.",
+      "id": "w-priors"
+    },
+    {
+      "id": "w-redshift",
+      "title": "Finalise and validate the calibration redshift sample",
+      "owner": "Martine Campbell, Will Hartley, Angus Wright, Adam Stanford, Marc Manera",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Define the spec-z sample, including gold/platinum spec-DB selections; quantify incompleteness and catastrophic failures. Test photo-z supplementation with FS2 and PAUS+COSMOS crossmatch information. zTFTz topical team is starting. Some calibration data access is pending; final sample is not confirmed.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "w-fswide",
+      "title": "Deliver final FS2 DR1-like wide samples",
+      "owner": "Francisco Castander",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "FS2_as_DR1 shear tomographic bins reproduce data N(z) and clustering amplitude well; position samples are less well matched. Investigate pruning high-z shear bins and finalise shape/position samples for validation.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "title": "Build realistic FS2 AUX / calibration mocks",
+      "owner": "Tyann Dumerchat, Francisco Castander",
+      "status": "Planned",
+      "priority": "High",
+      "due": "",
+      "evidence": "Reported",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "detail": "Tyann volunteered for the Deep-mock photometric side. Francisco needs AUX photometry and error catalogues to transform FS2. Apply SSI-calibrated Deep selections (COSMOS exists; extend to CDFS). Realistic redshift-calibrator selection, incompleteness and failure rates remain the harder unresolved task; ownership of this part needs confirmation.",
+      "id": "w-deep"
+    },
+    {
+      "title": "Cross-validate SGS and CosmoPipe on SHECAL",
+      "owner": "Angus Wright, Will Hartley",
+      "status": "Planned",
+      "priority": "High",
+      "due": "",
+      "evidence": "Proposed follow-up",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "detail": "Run data Deep/calibration samples against SHECAL wide simulations as the baseline; compare estimated N(z) with truth and SGS outputs. Use FS2 AUX catalogue-space or SSI mocks to test the impact of cross-calibration. Execution status and simulation availability need confirmation.",
+      "id": "w-shecal"
+    },
+    {
+      "id": "w-ssi",
+      "title": "Synthetic source injection and transfer-function tests",
+      "owner": "Tyann Dumerchat",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "DR1-like Wide, Deep and WideFromDeep mock products were shared. Investigate missing Deep calibrators, crowded-field shredding and systematic photometric errors. SSI transfer-function alternative is a validation route; pipeline adoption is not a confirmed DR1 decision.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "w-datacal",
+      "title": "Recalibrate DataCal photometric uncertainties",
+      "owner": "Tyann Dumerchat",
+      "status": "Planned",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Use SSI to define T_DataCalRescal, then rerun N(z) without changing the Euclid pipeline. Bright-source error underestimation is reported as the main issue, not non-Gaussianity. EXT object shot noise is absent in DR1 errors and SSI runs; planned for DR2.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "w-weight",
+      "title": "Test redshift-sample and completeness weighting",
+      "owner": "Angus Wright, Will Hartley, Giulia Giannini, Tyann Dumerchat",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "KiDS-Legacy Prior Volume weighting: Angus. DES Y3/Y6 3sDIR weighting: Will and Giulia. Compare f_c variants, cosmic variance, bias and effective sample size. Any wide-sample weighting needs consistent CS/GGL/GC/clustering-z bookkeeping. PHZ_WEIGHT use is DR2 work, not a confirmed DR1 implementation.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "w-som",
+      "title": "Augment Deep SOM coverage",
+      "owner": "Dan Masters, Yu-Heng Lin, Angus Wright",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Linear interpolation / inpainting of empty Deep SOM cells: Dan and Yu-Heng. Clustering SOM cells to improve coverage: Angus. Quantify changes in coverage and redshift bias before adopting a method.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "w-transfer",
+      "title": "Match pipeline features and source selections",
+      "owner": "Angus Wright, Tyann Dumerchat",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Additional source selections for transfer-function fidelity: Angus. SSI alternative to Yuzheng Kang's data-driven method: Tyann. Angus requested use of the actual pipeline features: unwhitened flux ratios to VIS, without amplitude.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "w-cc",
+      "title": "Clustering-z validation with SPHEREx and DESI",
+      "owner": "Martine Campbell",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "SPHEREx clustering-z validation has started; calibration-sample work awaits data permissions. Martine's documented code is private and available on request. Coordinate external checks with the final calibration sample and any selection changes.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "title": "Validate shift-and-stretch priors in the likelihood",
+      "owner": "William D'Assignies, Tyann Dumerchat, Jaime Ruiz-Zapatero",
+      "status": "Planned",
+      "priority": "High",
+      "due": "",
+      "evidence": "Proposed follow-up",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "detail": "Compare fitted parameters with moment-based estimates, asymmetric tails and cosmological recovery. Up to approximately 0.5 sigma biases were reported for moment statistics; inflated priors did not always recover unbiased cosmology. Request for 50-100 realisations is not an agreed requirement.",
+      "id": "w-fit"
+    },
+    {
+      "id": "w-shearratio",
+      "title": "Construct lens samples for shear-ratio validation",
+      "owner": "Alex Alarcon",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "DR1 KP shear-ratio implementation needs low-z lens samples with narrow N(z), sufficient density and minimal overlap with source samples. Explore Calum's sample and Euclid plus ground photometry; use RR2 shear-ratio measurements as a comparison.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "m-dr1-f",
+      "title": "DR1-F",
+      "owner": "zTF",
+      "status": "Planned",
+      "priority": "High",
+      "due": "2026-11-12",
+      "detail": "DR1-F milestone on 12 November 2026, supplied by the project owner.",
+      "source": "",
+      "evidence": "User update"
+    },
+    {
+      "id": "m-dr1",
+      "title": "DR1",
+      "owner": "zTF",
+      "status": "Planned",
+      "priority": "High",
+      "due": "2027-07-01",
+      "detail": "DR1 milestone on 1 July 2027, supplied by the project owner.",
+      "source": "",
+      "evidence": "User update"
+    },
+    {
+      "id": "m-stack",
+      "title": "First stacked N(z) in the SGS pipeline",
+      "owner": "Will Hartley and colleague",
+      "status": "Complete",
+      "priority": "High",
+      "due": "",
+      "detail": "Reported in June 2026; stack used a North and South tile list. Exact completion date is not provided. This is a pipeline milestone, not proof that final DR1 validation is complete.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "m-priors",
+      "title": "First estimate of DR1 N(z) prior uncertainties",
+      "owner": "zTF; plan led by Angus Wright",
+      "status": "Planned",
+      "priority": "High",
+      "due": "2026-11-30",
+      "detail": "Expected by end of November 2026. Date is interpreted as month-end. Aim for priors reliable enough not to require large later revisions; avoid doubling uncertainties between November and March.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "m-cross",
+      "title": "Review real-data / FS2 / SHECAL validation together",
+      "owner": "zTF; assignment to confirm",
+      "status": "Planned",
+      "priority": "High",
+      "due": "",
+      "detail": "Proposed checkpoint before prior handoff: compare sample populations, N(z), uncertainties and cross-calibrations. No deadline or formal milestone was assigned in the sources.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Proposed follow-up"
+    }
+  ],
+  "people": [
+    {
+      "title": "Angus Wright",
+      "owner": "",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "evidence": "Reported",
+      "source": "Project_Activity.txt",
+      "detail": "Task-force lead; CosmoPipe development/execution; SHECAL, FS2 and SI analyses; Prior Volume weighting; SOM clustering; transfer selections; redshift-sample definition and photo-z supplementation tests. Overall prior plan and FORS2 follow-up organiser.",
+      "id": "p-angus"
+    },
+    {
+      "id": "p-will",
+      "title": "Will Hartley",
+      "owner": "",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "SGS pipeline development/execution; calibration-sample compilation and AUX photometry; DES 3sDIR weights with Giulia; spectroscopic sample definition. Also called William Hartley in the summaries.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-tyann",
+      "title": "Tyann Dumerchat",
+      "owner": "",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Synthetic source injection development/execution; own-code FS2 and SI analyses; transfer-function alternative; source-injection mocks and completeness tests. Volunteered for Deep-mock photometric work.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-martine",
+      "title": "Martine Campbell",
+      "owner": "",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Cross-correlation measurement and code development/execution; spectroscopic sample definition; SPHEREx validation and calibration-sample construction, with data-permission dependency.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-wda",
+      "title": "William D'Assignies",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Internal/external clustering-z, DESI and cosmological-inference validation; shift-and-stretch tests and high-quality photo-z subsample requests.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-marc",
+      "title": "Marc Manera",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Named in spectroscopic sample construction, including the gold/platinum spec-DB effort. Activity counts do not define his responsibility.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-francisco",
+      "title": "Francisco Castander",
+      "owner": "",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Construction of Flagship2 updates and DR1-like samples; FS2 AUX-photometry transformation needs AUX catalogues and errors.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-giulia",
+      "title": "Giulia Giannini",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "DES Y3/Y6 3sDIR redshift-sample weighting with Will; expertise in redshift-sample and deep-field zero-point uncertainty propagation.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-alex",
+      "title": "Alex Alarcon",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "PAUS+COSMOS calibration-sample proposal; DR1 KP shear-ratio tests and lens-sample definition.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-jaime",
+      "title": "Jaime Ruiz-Zapatero",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Data-driven N(z) uncertainty methods (arXiv:2604.24425); statistical infrastructure; fitted stretch / moment limitations; wavelet-perturbation ideas.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-yuzheng",
+      "title": "Yuzheng Kang",
+      "owner": "",
+      "status": "Needs confirmation",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Data-driven photometry mocking / sample-noising method is a fundamental pipeline component. Current assignment not specified in the roster.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-guada",
+      "title": "Guadalupe Canas Herrera",
+      "owner": "",
+      "status": "Needs confirmation",
+      "priority": "Medium",
+      "due": "",
+      "detail": "N(z) estimation via Gaussian processes named in the April 2026 agenda; current tasks not confirmed.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-hendrik",
+      "title": "Hendrik Hildebrandt",
+      "owner": "",
+      "status": "Needs confirmation",
+      "priority": "Medium",
+      "due": "",
+      "detail": "KiDS-Legacy methodological input, spectroscopic-follow-up ideas and SHECAL/AUX validation questions. No operational assignment specified.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    },
+    {
+      "title": "Anna Porredon",
+      "owner": "",
+      "status": "Needs confirmation",
+      "priority": "Medium",
+      "due": "",
+      "evidence": "Reported",
+      "source": "Personnel.txt",
+      "detail": "Named for North/South TR1 N(z) in agendas, but specific current tasks are not described.",
+      "id": "p-anna"
+    },
+    {
+      "id": "p-klara",
+      "title": "Klara Bertmann",
+      "owner": "",
+      "status": "Needs confirmation",
+      "priority": "Medium",
+      "due": "",
+      "detail": "TR1 photometric-clustering N(z) and bias update named in the June agenda. Current assignment needs confirmation. TSV identifies Klara at rank 10; full-duration summary leaves one rank-10 identity unresolved.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "title": "Olivier Ilbert",
+      "owner": "",
+      "status": "Needs confirmation",
+      "priority": "Medium",
+      "due": "",
+      "evidence": "Reported",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "detail": "Channel co-manager; NISP spectra in COSMOS/CDFS for prioritising FORS2 targets, not directly for calibration.",
+      "id": "p-olivier"
+    },
+    {
+      "id": "p-dan",
+      "title": "Dan Masters",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Deep SOM empty-cell inpainting using linear interpolation. Named in Project_Activity.txt but absent from Personnel.txt.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-yuheng",
+      "title": "Yu-Heng Lin",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Deep SOM empty-cell inpainting using linear interpolation. Named in Project_Activity.txt but absent from Personnel.txt.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "p-adam",
+      "title": "Adam Stanford",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Spectroscopic sample construction and spec-DB input; updated DESI COSMOS compilation discussed. Named in Project_Activity.txt but absent from Personnel.txt.",
+      "source": "Project_Activity.txt",
+      "evidence": "Reported"
+    }
+  ],
+  "infrastructure": [
+    {
+      "id": "i-sgs",
+      "title": "SGS pipeline",
+      "owner": "Will Hartley",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Per-tile N_t(z) production and aggregation into tomographic N(z); WL, GC and 2DMASS only. Bias estimates with FS2 and OU-SIM/SHECAL mocks. ONLY infrastructure allowed to produce Consortium- and ESA-endorsed data products. First stacked N(z) reported June 2026.",
+      "source": "Infrastructure.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "i-cosmo",
+      "title": "CosmoPipe",
+      "owner": "Angus Wright",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Direct tomographic N(z) estimation; flexible samples and extra quantity splits. Bias estimation with FS2, OU-SIM/SHECAL and synthetic source injection mocks. Agile offline validation and cross-checks; not the endorsed-product production route.",
+      "source": "Infrastructure.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "i-tyann",
+      "title": "Tyann's SI infrastructure (unnamed)",
+      "owner": "Tyann Dumerchat",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Computes redshift-distribution bias parameters from synthetic source injection. Activity file also names own-code FS2 and SI analyses.",
+      "source": "Infrastructure.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "i-cc",
+      "title": "Martine's cross-correlation infrastructure (unnamed)",
+      "owner": "Martine Campbell",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Per-tomographic-bin N(z) from spectroscopic cross-correlations with DESI and SPHEREx (sphere-X in infrastructure file). Documented private code available on request; data permissions are a dependency.",
+      "source": "Infrastructure.txt",
+      "evidence": "Reported"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "d-sgs",
+      "title": "Endorsed data products must use SGS",
+      "owner": "Will Hartley",
+      "status": "Complete",
+      "priority": "High",
+      "due": "",
+      "detail": "SGS is the sole Consortium/ESA-endorsed production route. CosmoPipe and other infrastructures provide flexible analysis and validation, not an alternative endorsement path.",
+      "source": "Infrastructure.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "d-shift",
+      "title": "DR1 baseline: shift-and-stretch metadata, no arbitrary N(z) correction",
+      "owner": "zTF / SGS",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Frozen data model allows bias/stretch metadata; arbitrary R(z) corrections to fiducial N(z) are not in scope. Hartley's final reported baseline is no bias correction, potentially subject to change. Nonzero shift-prior interpretation may require EuclidLib changes. Adequacy for tails and cosmology remains debated.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "title": "Use unwhitened flux ratios to VIS",
+      "owner": "Angus Wright, Will Hartley",
+      "status": "Complete",
+      "priority": "Medium",
+      "due": "",
+      "evidence": "Reported",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "detail": "Align testing with pipeline colour features, without amplitude. Lupticolour/amplitude tests changed bias and bin overlap but did not improve cosmological forecasts. Request to align features is reported; completion is not.",
+      "id": "d-features"
+    },
+    {
+      "id": "d-weight",
+      "title": "Completeness cuts versus weights remain under test",
+      "owner": "zTF",
+      "status": "Needs confirmation",
+      "priority": "High",
+      "due": "",
+      "detail": "DR1 can define uncalibratable Wide SOM cells. PHZ_WEIGHT use is DR2 work. f_c weighting options are disputed and need consistent data-vector bookkeeping; no final threshold or variant is adopted here.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "d-fields",
+      "title": "DR1 calibration uses COSMOS and CDFS",
+      "owner": "Will Hartley, Angus Wright",
+      "status": "Complete",
+      "priority": "High",
+      "due": "",
+      "detail": "DR1 uses these two AUX fields for calibration. Deep sample gets the Wide selection after noising. Euclid NISP spectra discussed for FORS target prioritisation, not direct calibration use.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    }
+  ],
+  "risks": [
+    {
+      "id": "r-sample",
+      "title": "Calibration-sample variance and incompleteness",
+      "owner": "zTF redshift-sample team",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Likely dominant uncertainty: only two fields, incomplete colour coverage, calibrator abundance/quality and catastrophic redshift failures. Need first-order sample-variance correction, residual estimate and realistic mock redshift selection. Proposed mitigation: compare independent samples and propagate uncertainty through SOMs.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "r-mock",
+      "title": "Simulation fidelity and missing calibration mocks",
+      "owner": "Francisco Castander, Tyann Dumerchat",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "FS2/Deep colour-redshift mismatch and poor low/high-z photo-z fidelity can bias calibration. SHECAL lacks a self-consistent AUX/calibration simulation baseline. Proposed mitigation: real-data cross-calibration plus SSI/FS2 AUX tests, with selection realism validated explicitly.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "r-model",
+      "title": "Shift-and-stretch may miss asymmetric tail bias",
+      "owner": "William D'Assignies, Tyann Dumerchat",
+      "status": "In progress",
+      "priority": "High",
+      "due": "",
+      "detail": "Moment-derived parameters can be biased; broader priors did not always unbias cosmology. Frozen data model limits alternatives. Proposed mitigation: likelihood-consistent fits, enough realisations and explicit cosmological-recovery tests; do not assume the debate is resolved.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "r-access",
+      "title": "Calibration and AUX catalogue access",
+      "owner": "Martine Campbell, Will Hartley",
+      "status": "Blocked",
+      "priority": "High",
+      "due": "",
+      "detail": "Martine awaits calibration-data permissions. Hartley reports an IDR mount problem; AUX catalogues are in SWG-GAE/KP3 deep and planned for zTF photometric_cats/AUX_tiles. AUX sample selection: VIS<25.5 OR H<25.5, without VIS_DET=1. Confirm access before dependent runs.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "r-noise",
+      "title": "Photometric-error and transfer-function mismatch",
+      "owner": "Tyann Dumerchat, Will Hartley",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Bright-source uncertainties underestimated; correlated noise and missing EXT shot noise affect calibration. SSI DataCalRescal is planned; EXT shot-noise inclusion is DR2. Need to measure impact on DR1 bias.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "r-resources",
+      "title": "November prior handoff has limited time and people",
+      "owner": "Angus Wright / zTF",
+      "status": "In progress",
+      "priority": "High",
+      "due": "2026-11-30",
+      "detail": "Concrete task ownership, simulation readiness and uncertainty-to-prior translation remain open. Proposed mitigation: confirm assignments and dependencies; prioritise the dominant uncertainty and stable priors over unvalidated last-minute changes.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    }
+  ],
+  "timeline": [
+    {
+      "id": "t-launch",
+      "title": "Jul-Aug 2025 | Task force launch",
+      "owner": "",
+      "status": "Complete",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Channel opened 18 July 2025. Offline N(z) implementation and spectroscopic-follow-up plans began.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "t-rr2",
+      "title": "Sep-Nov 2025 | RR2 / RR2v2 and transfer-function checks",
+      "owner": "",
+      "status": "Complete",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Telescope proposal submitted; source injection and DR1 photometry tested; low/high-z simulation quality shortfalls and WL outliers diagnosed; RR2v2 N(z) released to CosmoHub.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "t-tr1",
+      "title": "Dec 2025-Feb 2026 | TR1 and FS2-Deep fidelity",
+      "owner": "",
+      "status": "Complete",
+      "priority": "Medium",
+      "due": "",
+      "detail": "TR1 cycle-one planning; North/South and H-selected N(z); CosmoPipe tutorial; colour-redshift differences in FS2 versus FS2-Deep discussed.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "t-spec",
+      "title": "Mar-Apr 2026 | FORS2 and redshift-sample definition",
+      "owner": "",
+      "status": "Complete",
+      "priority": "Medium",
+      "due": "",
+      "detail": "FORS2 preparation and NISP-based target prioritisation; DESI/spec-z compilation and photo-z supplementation; project highlights and FS2 updates.",
+      "source": "ou-phz-ztf_full_summary_top10.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "t-summer",
+      "title": "May-Jul 2026 | First SGS stacks and methodology tests",
+      "owner": "",
+      "status": "Complete",
+      "priority": "Medium",
+      "due": "",
+      "detail": "Data-driven uncertainty methods; first pipeline stacked N(z); PAUS+COSMOS; SSI shear mocks; DataCal errors, completeness weights and SOM feature tests. Period complete does not imply all workstreams finished.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    },
+    {
+      "id": "t-autumn",
+      "title": "Sep-Oct 2026 | DR1 priors and validation planning",
+      "owner": "",
+      "status": "Complete",
+      "priority": "High",
+      "due": "",
+      "detail": "SHECAL/FS2 validation, shift-and-stretch debate, SPHEREx clustering-z, shear-ratio lens samples and November prior-uncertainty task list.",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "evidence": "Reported"
+    }
+  ]
+}

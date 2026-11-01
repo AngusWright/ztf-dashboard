@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-mode="public">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zTF | Project dashboard</title>
+  <link rel="stylesheet" href="./dashboard.css">
+  <script src="./dashboard.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="./"><span class="brand-mark">z</span><span>zTF <small>EUCLID / OU-PHZ</small></span></a>
+    <div class="nav-label">PROJECT WORKSPACE</div>
+    <nav aria-label="Dashboard sections">
+      <button data-tab="overview" class="active"><span>01</span> Overview</button>
+      <button data-tab="workstreams"><span>02</span> Workstreams</button>
+      <button data-tab="milestones"><span>03</span> Milestones</button>
+      <button data-tab="people"><span>04</span> Team & responsibilities</button>
+      <button data-tab="infrastructure"><span>05</span> Infrastructure</button>
+      <button data-tab="governance"><span>06</span> Decisions & risks</button>
+      <button data-tab="timeline"><span>07</span> Project timeline</button>
+      <button data-tab="sources"><span>08</span> Sources & activity</button>
+      <button data-tab="gantt"><span>09</span> Gantt chart</button>
+    </nav>
+    <div class="sidebar-bottom"><span class="live-dot"></span> <span id="workspace-label">LOCAL WORKSPACE</span><p id="workspace-description">Saved in this folder.<br>No external services.</p><div id="save-status" role="status" aria-live="polite">Connecting...</div></div>
+  </aside>
+  <main>
+    <header class="topbar"><div>EUCLID CONSORTIUM <span>/</span> DR1 CALIBRATION</div><div class="actions"><button id="export" disabled>Export JSON</button><button id="import" disabled>Import JSON</button><button id="retry" hidden>Retry save</button></div></header>
+    <div id="error" class="error" role="alert" hidden></div>
+    <div id="loading">Loading project dashboard...</div>
+    <div id="app" hidden>
+      <section class="page-heading"><div><p class="eyebrow" id="section-kicker">PROJECT AT A GLANCE</p><h1 id="section-title">Overview</h1><p id="section-subtitle"></p></div><button id="add-record" class="primary" hidden>+ Add item</button><button id="edit-project">Edit project overview</button></section>
+      <section id="overview"></section>
+      <section id="filters" class="filters" hidden>
+        <input id="search" type="search" placeholder="Search titles, people, notes..." aria-label="Search records">
+        <select id="status-filter" aria-label="Filter by status"><option value="">All statuses</option></select>
+        <select id="owner-filter" aria-label="Filter by owner"><option value="">All owners</option></select>
+        <select id="priority-filter" aria-label="Filter by priority"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
+        <span id="result-count"></span>
+      </section>
+      <section id="records"></section>
+      <section id="gantt" hidden></section>
+      <section id="sources" hidden></section>
+      <footer>Source snapshot <span id="snapshot-label"></span> <span>&middot;</span> <span id="snapshot-note">Dates and initial statuses require confirmation. Original source files are read-only.</span></footer>
+    </div>
+  </main>
+  <dialog id="editor">
+    <form id="edit-form">
+      <div class="dialog-heading"><div><p class="eyebrow">UPDATE THE WORKSPACE</p><h2 id="editor-title">Edit item</h2></div><button type="button" data-close="editor" aria-label="Close editor" class="icon-button">&times;</button></div>
+      <label>Title<input name="title" required maxlength="20000"></label>
+      <div class="form-grid">
+        <label>Owner / responsible people<input name="owner" placeholder="Unassigned" maxlength="20000"></label>
+        <label>Status<select name="status"></select></label>
+        <label>Priority<select name="priority"></select></label>
+        <label>Target date<input name="due" type="date"></label>
+        <label id="start-field" hidden>Start date<input name="start" type="date" disabled></label>
+        <label>Evidence<select name="evidence"></select></label>
+        <label>Source reference<select name="source"></select></label>
+      </div>
+      <label>Details / progress notes<textarea name="detail" rows="6" maxlength="20000"></textarea></label>
+      <p class="hint">No date means no confirmed deadline. Mark new observations as “User update”; retain source references for traceability.</p>
+      <div class="dialog-actions"><button type="button" id="delete-record" class="danger">Delete item</button><span></span><button type="button" data-close="editor">Cancel</button><button type="submit" class="primary">Save changes</button></div>
+    </form>
+  </dialog>
+  <dialog id="project-editor">
+    <form id="project-form">
+      <div class="dialog-heading"><h2>Edit project overview</h2><button type="button" data-close="project-editor" aria-label="Close project editor" class="icon-button">&times;</button></div>
+      <label>Project title<input name="title" required maxlength="20000"></label>
+      <label>Summary<textarea name="summary" rows="4" maxlength="20000"></textarea></label>
+      <div class="form-grid"><label>Information snapshot date<input name="snapshot" type="date"></label><label>Main target date<input name="target" type="date"></label></div>
+      <label>Target explanation<textarea name="target_note" rows="3" maxlength="20000"></textarea></label>
+      <label>Source caveats / notes<textarea name="caveats" rows="5" maxlength="20000"></textarea></label>
+      <div class="dialog-actions"><span></span><button type="button" data-close="project-editor">Cancel</button><button type="submit" class="primary">Save changes</button></div>
+    </form>
+  </dialog>
+  <dialog id="source-reader"><div class="dialog-heading"><h2 id="source-title"></h2><button data-close="source-reader" aria-label="Close source" class="icon-button">&times;</button></div><pre id="source-text"></pre></dialog>
+  <input id="import-file" type="file" accept=".json,application/json" hidden>
+</body>
+</html>
