@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "revision": 11,
-  "updated_at": "2026-10-31T21:44:08Z",
+  "revision": 33,
+  "updated_at": "2026-11-02T10:47:02.076620+00:00",
   "project": {
     "title": "Redshift calibration task force",
     "summary": "Prepare robust Euclid DR1 redshift distributions and prior uncertainties for weak lensing, galaxy clustering and 2D mass mapping. Compare real data, Flagship2 and SHECAL; validate calibration-sample coverage, transfer functions and the shift-and-stretch uncertainty model.",
@@ -13,25 +13,27 @@
   "workstreams": [
     {
       "title": "Define the DR1 prior-uncertainty plan",
-      "owner": "Angus Wright",
+      "owner": "Angus Wright, all zTF",
       "status": "In progress",
       "priority": "High",
       "due": "2026-11-16",
+      "start": "",
       "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
-      "detail": "Set the overall plan for forward-propagating uncertainty through SOMs into N(z) realisations and final priors. Resolve how simulation and real-data constraints enter without double counting; decide North/South treatment and the number of realisations. November target is reported, delivery not confirmed.",
+      "detail": "Set the overall plan for forward-propagating uncertainty through SOMs into N(z) realisations and final priors. \n- Resolve how simulation and real-data constraints enter the uncertainty budget.  \n- Decide North/South treatment \n- Define the number of simulation realisations. \n",
       "id": "w-priors"
     },
     {
-      "id": "w-redshift",
       "title": "Finalise and validate the calibration redshift sample",
-      "owner": "Martine Campbell, Will Hartley, Angus Wright, Adam Stanford, Marc Manera",
+      "owner": "[zTFTz] Martine Campbell, Will Hartley, Angus Wright, Adam Stanford, Marc Manera",
       "status": "In progress",
       "priority": "High",
-      "due": "",
-      "detail": "Define the spec-z sample, including gold/platinum spec-DB selections; quantify incompleteness and catastrophic failures. Test photo-z supplementation with FS2 and PAUS+COSMOS crossmatch information. zTFTz topical team is starting. Some calibration data access is pending; final sample is not confirmed.",
+      "due": "2027-02-01",
+      "start": "",
+      "evidence": "Reported",
       "source": "Project_Activity.txt",
-      "evidence": "Reported"
+      "detail": "Define the redshift sample. Including:\n- gold/platinum spec-DB selections\n- quantification of incompleteness and catastrophic failures\n- testing of photo-z supplementation: \n    -> COSMOS2020 \n    -> COSMOS2025 \n    -> PAUS ",
+      "id": "w-redshift"
     },
     {
       "id": "w-fswide",
@@ -45,11 +47,12 @@
       "evidence": "Reported"
     },
     {
-      "title": "Build realistic FS2 AUX / calibration mocks",
+      "title": "Build realistic FS2 AUX / redshift mocks",
       "owner": "Tyann Dumerchat, Francisco Castander",
       "status": "Planned",
       "priority": "High",
-      "due": "",
+      "due": "2026-11-13",
+      "start": "",
       "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
       "detail": "Tyann volunteered for the Deep-mock photometric side. Francisco needs AUX photometry and error catalogues to transform FS2. Apply SSI-calibrated Deep selections (COSMOS exists; extend to CDFS). Realistic redshift-calibrator selection, incompleteness and failure rates remain the harder unresolved task; ownership of this part needs confirmation.",
@@ -89,37 +92,40 @@
       "evidence": "Reported"
     },
     {
-      "id": "w-weight",
       "title": "Test redshift-sample and completeness weighting",
       "owner": "Angus Wright, Will Hartley, Giulia Giannini, Tyann Dumerchat",
       "status": "In progress",
       "priority": "Medium",
-      "due": "",
-      "detail": "KiDS-Legacy Prior Volume weighting: Angus. DES Y3/Y6 3sDIR weighting: Will and Giulia. Compare f_c variants, cosmic variance, bias and effective sample size. Any wide-sample weighting needs consistent CS/GGL/GC/clustering-z bookkeeping. PHZ_WEIGHT use is DR2 work, not a confirmed DR1 implementation.",
+      "due": "2027-02-12",
+      "start": "",
+      "evidence": "Reported",
       "source": "Project_Activity.txt",
-      "evidence": "Reported"
+      "detail": "KiDS-Legacy Prior Volume weighting: Angus. DES Y3/Y6 3sDIR weighting: Will and Giulia. Compare f_c variants, cosmic variance, bias and effective sample size. Any wide-sample weighting needs consistent CS/GGL/GC/clustering-z bookkeeping. PHZ_WEIGHT use is DR2 work, not a confirmed DR1 implementation.",
+      "id": "w-weight"
     },
     {
-      "id": "w-som",
       "title": "Augment Deep SOM coverage",
       "owner": "Dan Masters, Yu-Heng Lin, Angus Wright",
       "status": "In progress",
       "priority": "Medium",
-      "due": "",
-      "detail": "Linear interpolation / inpainting of empty Deep SOM cells: Dan and Yu-Heng. Clustering SOM cells to improve coverage: Angus. Quantify changes in coverage and redshift bias before adopting a method.",
+      "due": "2027-01-31",
+      "start": "",
+      "evidence": "Reported",
       "source": "Project_Activity.txt",
-      "evidence": "Reported"
+      "detail": "Linear interpolation / inpainting of empty Deep SOM cells: Dan and Yu-Heng. Clustering SOM cells to improve coverage: Angus. Quantify changes in coverage and redshift bias before adopting a method.",
+      "id": "w-som"
     },
     {
-      "id": "w-transfer",
       "title": "Match pipeline features and source selections",
       "owner": "Angus Wright, Tyann Dumerchat",
       "status": "In progress",
       "priority": "Medium",
-      "due": "",
-      "detail": "Additional source selections for transfer-function fidelity: Angus. SSI alternative to Yuzheng Kang's data-driven method: Tyann. Angus requested use of the actual pipeline features: unwhitened flux ratios to VIS, without amplitude.",
+      "due": "2026-12-31",
+      "start": "",
+      "evidence": "Reported",
       "source": "Project_Activity.txt",
-      "evidence": "Reported"
+      "detail": "Additional source selections for transfer-function fidelity: Angus. SSI alternative to Yuzheng Kang's data-driven method: Tyann. Angus requested use of the actual pipeline features: unwhitened flux ratios to VIS, without amplitude.",
+      "id": "w-transfer"
     },
     {
       "id": "w-cc",
@@ -168,28 +174,6 @@
       "evidence": "User update"
     },
     {
-      "id": "m-dr1",
-      "title": "DR1",
-      "owner": "zTF",
-      "status": "Planned",
-      "priority": "High",
-      "due": "2027-07-01",
-      "detail": "DR1 milestone on 1 July 2027, supplied by the project owner.",
-      "source": "",
-      "evidence": "User update"
-    },
-    {
-      "id": "m-stack",
-      "title": "First stacked N(z) in the SGS pipeline",
-      "owner": "Will Hartley and colleague",
-      "status": "Complete",
-      "priority": "High",
-      "due": "",
-      "detail": "Reported in June 2026; stack used a North and South tile list. Exact completion date is not provided. This is a pipeline milestone, not proof that final DR1 validation is complete.",
-      "source": "ou-phz-ztf_summary_6months.txt",
-      "evidence": "Reported"
-    },
-    {
       "id": "m-priors",
       "title": "First estimate of DR1 N(z) prior uncertainties",
       "owner": "zTF; plan led by Angus Wright",
@@ -201,15 +185,92 @@
       "evidence": "Reported"
     },
     {
-      "id": "m-cross",
       "title": "Review real-data / FS2 / SHECAL validation together",
       "owner": "zTF; assignment to confirm",
       "status": "Planned",
       "priority": "High",
-      "due": "",
-      "detail": "Proposed checkpoint before prior handoff: compare sample populations, N(z), uncertainties and cross-calibrations. No deadline or formal milestone was assigned in the sources.",
+      "due": "2027-04-01",
+      "evidence": "Proposed follow-up",
       "source": "ou-phz-ztf_summary_6months.txt",
-      "evidence": "Proposed follow-up"
+      "detail": "Proposed checkpoint before prior handoff: compare sample populations, N(z), uncertainties and cross-calibrations. No deadline or formal milestone was assigned in the sources.",
+      "id": "m-cross"
+    },
+    {
+      "title": "First estimate of Nz for GC sample from SGS (DR1_R3)",
+      "owner": "",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "2026-11-30",
+      "evidence": "User update",
+      "source": "",
+      "detail": "",
+      "id": "043c2347-c434-43f1-8d70-c15fdab1b4e5"
+    },
+    {
+      "title": "First estimate of Nz for WL samples (LensMC & MetaCal) from SGS (DR1_R3, with Shear Weights)",
+      "owner": "",
+      "status": "Planned",
+      "priority": "Medium",
+      "due": "2026-11-30",
+      "evidence": "User update",
+      "source": "",
+      "detail": "",
+      "id": "442c65ab-0cb0-4fea-baf3-2063078f379d"
+    },
+    {
+      "title": "Compilation of redshift sample for first SGS Nz estimates (Nov Deadline)",
+      "owner": "",
+      "status": "Planned",
+      "priority": "Medium",
+      "due": "2026-11-13",
+      "evidence": "User update",
+      "source": "",
+      "detail": "",
+      "id": "dc77c4d1-2d1a-4c12-bdcb-29ab6119c234"
+    },
+    {
+      "title": "Train final SGS Deep/AUX SOM(s)",
+      "owner": "Will Hartley, zTFTz ",
+      "status": "Planned",
+      "priority": "Medium",
+      "due": "2026-11-20",
+      "evidence": "User update",
+      "source": "",
+      "detail": "Requires definition of SOM sizes, how many SOMs (i.e. different ones for GC/WL). ",
+      "id": "83987e59-0a88-4dd7-9f91-fcfbda305d06"
+    },
+    {
+      "title": "Train final SGS Wide SOM(s)",
+      "owner": "",
+      "status": "Planned",
+      "priority": "Medium",
+      "due": "2026-11-20",
+      "evidence": "User update",
+      "source": "",
+      "detail": "Requires definition of SOM sizes, how many SOMs (i.e. different ones for GC/WL). ",
+      "id": "48bb94f5-d15c-4068-a32c-81ff5f169f33"
+    },
+    {
+      "title": "Construction of final Transfer functions from YK method in SGS pipeline",
+      "owner": "",
+      "status": "Planned",
+      "priority": "Medium",
+      "due": "2026-11-25",
+      "evidence": "User update",
+      "source": "",
+      "detail": "Requires final samples from Deep/AUX and weights from Wide, final SOMs, etc \n",
+      "id": "30337e3f-9e5e-4bc1-a5b3-db7fb79dec26"
+    },
+    {
+      "title": "Delivery of SGS first estimates of delta(z)",
+      "owner": "",
+      "status": "Planned",
+      "priority": "Medium",
+      "due": "2026-11-30",
+      "evidence": "User update",
+      "source": "",
+      "detail": "Requires FS2 samples defined for AUX/Wide by FC \n\nGoal: \n- generate Deep/AUX data from FS2\n- simulate ZP failure \n- marginalise of SV \n- simulate different redshift samples \n\nAlternative if there is a blockage in deep Simulations: \n- Just use wide simulation and data everything-else ",
+      "id": "13cc4857-027e-408d-9623-1bfa262e6cb3"
     }
   ],
   "people": [
