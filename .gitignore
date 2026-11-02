@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.DS_Store
+/Infrastructure.txt
+/Personnel.txt
+/Project_Activity.txt
+/ou-phz-ztf_full_summary_top10.txt
+/ou-phz-ztf_summary_6months.txt
+/ztf_contributions.tsv
