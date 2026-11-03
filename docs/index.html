@@ -33,7 +33,7 @@
       <section id="overview"></section>
       <section id="person-schedule" hidden>
         <div class="person-schedule-controls">
-          <div><h2>Personal schedule</h2><p class="hint">Named and shared-owner assignments, plus zTF-wide items. Unassigned items are excluded. Team-list filters below do not affect this chart.</p></div>
+          <div><h2>Personal schedule</h2><p class="hint">Named and shared-owner assignments, plus zTF-wide items and zTFTz items for members identified from their bios. Unassigned items are excluded. Team-list filters below do not affect this chart.</p></div>
           <label for="schedule-person">Person<select id="schedule-person"></select></label>
         </div>
         <div id="person-gantt"></div>
@@ -56,16 +56,16 @@
       <div class="dialog-heading"><div><p class="eyebrow">UPDATE THE WORKSPACE</p><h2 id="editor-title">Edit item</h2></div><button type="button" data-close="editor" aria-label="Close editor" class="icon-button">&times;</button></div>
       <label>Title<input name="title" required maxlength="20000"></label>
       <div class="form-grid">
-        <label>Owner / responsible people<input name="owner" placeholder="Unassigned" maxlength="20000"></label>
-        <label>Status<select name="status"></select></label>
-        <label>Priority<select name="priority"></select></label>
-        <label>Target date<input name="due" type="date"></label>
+        <label id="owner-field">Owner / responsible people<input name="owner" placeholder="Unassigned" maxlength="20000"></label>
+        <label><span id="status-label">Status</span><select name="status"></select></label>
+        <label><span id="priority-label">Priority</span><select name="priority"></select></label>
+        <label id="due-field">Target date<input name="due" type="date"></label>
         <label id="start-field" hidden>Start date<input name="start" type="date" disabled></label>
-        <label>Evidence<select name="evidence"></select></label>
-        <label>Source reference<select name="source"></select></label>
+        <label id="evidence-field">Evidence<select name="evidence"></select></label>
+        <label id="source-field">Source reference<select name="source"></select></label>
       </div>
-      <label>Details / progress notes<textarea name="detail" rows="6" maxlength="20000"></textarea></label>
-      <p class="hint">No date means no confirmed deadline. Mark new observations as “User update”; retain source references for traceability.</p>
+      <label><span id="detail-label">Details / progress notes</span><textarea name="detail" rows="6" maxlength="20000"></textarea></label>
+      <p class="hint" id="editor-hint">No date means no confirmed deadline. Mark new observations as “User update”; retain source references for traceability.</p>
       <div class="dialog-actions"><button type="button" id="delete-record" class="danger">Delete item</button><span></span><button type="button" data-close="editor">Cancel</button><button type="submit" class="primary">Save changes</button></div>
     </form>
   </dialog>

@@ -8,3 +8,5 @@
 [data-mode="public"] #import,[data-mode="public"] #retry,[data-mode="public"] #add-record,[data-mode="public"] #edit-project{display:none!important}.gantt-unscheduled>div>span{font-size:11px;padding:8px 13px;border:1px solid var(--line);border-radius:7px;overflow-wrap:anywhere}
 .person-schedule-controls{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:16px}.person-schedule-controls>div{flex:1;min-width:0}.person-schedule-controls .hint{margin:7px 0 0}.person-schedule-controls label{margin:0;min-width:220px;max-width:100%}.person-schedule-controls select{width:100%}
 @media(max-width:760px){.person-schedule-controls{align-items:stretch;flex-direction:column;gap:13px}.person-schedule-controls label{min-width:0}}
+.status-active{background:#def0e6;color:#24664c}.status-observer{background:#edf0f8;color:#5a6790}.status-inactive{background:#eef1ef;color:#62777a}
+.status-in-use{background:#def0e6;color:#24664c}.status-in-development{background:#e0efed;color:#176f67}

@@ -2,6 +2,15 @@
 
 const EDITABLE = document.documentElement.dataset.mode === "local";
 const STATUSES = ["Needs confirmation", "Planned", "In progress", "Blocked", "Complete"];
+const ACTIVITY_STATUSES = ["Active", "Observer", "Inactive"];
+const INFRASTRUCTURE_STATUSES = ["In Use", "In Development", "Planned"];
+const LEGACY_INFRASTRUCTURE_STATUSES = {
+  "Needs confirmation": "Planned",
+  "Planned": "Planned",
+  "In progress": "In Development",
+  "Blocked": "Planned",
+  "Complete": "In Use"
+};
 const PRIORITIES = ["High", "Medium", "Low"];
 const EVIDENCE = ["Reported", "Proposed follow-up", "User update"];
 const COLLECTIONS = ["workstreams", "milestones", "people", "infrastructure", "decisions", "risks", "timeline"];
@@ -20,7 +29,7 @@ const TAB_INFO = {
   people: ["PEOPLE & OWNERSHIP", "Team & responsibilities", "16 roster members plus 3 explicitly named collaborators. Roles are sourced; current availability needs confirmation."],
   infrastructure: ["ANALYSIS & PRODUCTION", "Infrastructure", "SGS is the only Consortium- and ESA-endorsed production route."],
   governance: ["ASSUMPTIONS & DEPENDENCIES", "Decisions & risks", "Distinguish the reported baseline from unresolved methodological choices."],
-  timeline: ["PROJECT HISTORY", "Project timeline", "Reported phases from launch to the October 2026 planning snapshot."],
+  timeline: ["PROJECT HISTORY & SCHEDULE", "Project timeline", "Project history plus live workstreams and milestones, ordered by target date; undated items appear last."],
   gantt: ["SCHEDULE & HANDOFFS", "Gantt chart", "Workstream schedules and dated milestones. Click a row to edit its dates and progress."],
   sources: ["EVIDENCE & CONTEXT", "Sources & activity", "Read the six original files. Activity counts are not responsibility or performance metrics."]
 };
@@ -38,6 +47,8 @@ const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
 const slug = (value) => value.toLowerCase().replaceAll(" ", "-");
 const options = (values, blank = null) => (blank === null ? "" : `<option value="">${escapeHtml(blank)}</option>`) + values.map((value) => `<option>${escapeHtml(value)}</option>`).join("");
+const statusesFor = (collection) => collection === "people" ? ACTIVITY_STATUSES : collection === "infrastructure" ? INFRASTRUCTURE_STATUSES : STATUSES;
+const byTargetDate = (a, b) => a.due && b.due ? a.due.localeCompare(b.due) : a.due ? -1 : b.due ? 1 : 0;
 const dateLabel = (value) => value ? new Date(`${value}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "Not set";
 function daysTo(value) {
   const today = new Date();
@@ -112,13 +123,14 @@ async function persist() {
     updateSaveStatus("NOT SAVED - export a backup");
   }
 }
-function card(record, collection) {
+function card(record, collection, showType = false) {
+  const hideReferences = collection === "people" || collection === "infrastructure";
   return `<article class="card">
     <div class="card-head"><h3>${escapeHtml(record.title)}</h3>${EDITABLE ? `<button data-edit="${escapeHtml(record.id)}" data-collection="${collection}">Edit</button>` : ""}</div>
-    <div class="tags">${badge(record.status)}<span class="badge priority-${slug(record.priority)}">${escapeHtml(record.priority)} priority</span><span class="badge">${escapeHtml(record.evidence)}</span></div>
+    <div class="tags">${showType ? `<span class="badge">${collection === "workstreams" ? "Workstream" : "Milestone"}</span>` : ""}${badge(record.status)}<span class="badge priority-${slug(record.priority)}">${collection === "people" ? `Bus risk: ${escapeHtml(record.priority)}` : `${escapeHtml(record.priority)} priority`}</span>${collection === "people" ? (isRedshiftSampleTeam(record) ? '<span class="badge">zTFTz</span>' : "") : hideReferences ? "" : `<span class="badge">${escapeHtml(record.evidence)}</span>`}</div>
     <p class="card-detail">${escapeHtml(record.detail)}</p>
-    <div class="record-meta">${collection === "people" || collection === "timeline" ? "" : `<span>Owner <strong>${escapeHtml(record.owner || "Unassigned")}</strong></span>`}${record.start ? `<span>Start <strong>${escapeHtml(dateLabel(record.start))}</strong></span>` : ""}${dueLabel(record)}</div>
-    ${record.source ? `<div class="record-source">${EDITABLE ? `<button class="source-link" data-source="${escapeHtml(record.source)}">${escapeHtml(record.source)}</button>` : `<span class="source-link">Reference: ${escapeHtml(record.source)} (not published)</span>`}</div>` : ""}
+    ${collection === "people" ? "" : `<div class="record-meta">${collection === "timeline" ? "" : `<span>Owner <strong>${escapeHtml(record.owner || "Unassigned")}</strong></span>`}${hideReferences ? "" : `${record.start ? `<span>Start <strong>${escapeHtml(dateLabel(record.start))}</strong></span>` : ""}${dueLabel(record)}`}</div>`}
+    ${!hideReferences && record.source ? `<div class="record-source">${EDITABLE ? `<button class="source-link" data-source="${escapeHtml(record.source)}">${escapeHtml(record.source)}</button>` : `<span class="source-link">Reference: ${escapeHtml(record.source)} (not published)</span>`}</div>` : ""}
   </article>`;
 }
 function focusRow(record, collection, index) {
@@ -150,12 +162,21 @@ function renderOverview() {
     <div class="notice"><strong>Production boundary:</strong> only SGS can produce Consortium- and ESA-endorsed products. CosmoPipe and other tools support analysis and validation.</div>
     <div class="caveats"><strong>How to read this dashboard</strong><p>${escapeHtml(state.project.caveats)}</p></div>`;
 }
+function normalizeWords(value) {
+  return value.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+function isRedshiftSampleTeam(person) {
+  const bio = normalizeWords(person.detail);
+  if (/\bnot (?:a )?(?:member of|part of) (?:the )?ztftz\b/.test(bio)) return false;
+  return /\b(?:member of|part of) (?:the )?ztftz\b|\bztftz member\b/.test(bio) ||
+    /\b(?:spectroscopic|redshift|calibration) sample (?:definition|construction|compilation)\b/.test(bio);
+}
 function assignedToPerson(record, person) {
-  const normalize = (value) => value.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-  const owner = ` ${normalize(record.owner)} `;
-  const name = normalize(person.title);
+  const owner = ` ${normalizeWords(record.owner)} `;
+  const name = normalizeWords(person.title);
   const names = name === "will hartley" || name === "william hartley" ? ["will hartley", "william hartley"] : [name];
-  return owner.includes(" ztf ") || names.some((candidate) => candidate && owner.includes(` ${candidate} `));
+  return owner.includes(" ztf ") || (owner.includes(" ztftz ") && isRedshiftSampleTeam(person)) ||
+    names.some((candidate) => candidate && owner.includes(` ${candidate} `));
 }
 function renderPersonSchedule() {
   const people = [...state.people].sort((a, b) => a.title.localeCompare(b.title));
@@ -232,6 +253,7 @@ function ganttChart(applyFilters, person = null) {
 }
 function collectionsForTab() {
   if (tab === "gantt") return ["workstreams", "milestones"];
+  if (tab === "timeline") return ["timeline", "workstreams", "milestones"];
   return tab === "governance" ? ["decisions", "risks"] : COLLECTIONS.includes(tab) ? [tab] : [];
 }
 function refreshOwnerFilter() {
@@ -252,9 +274,24 @@ function renderRecords() {
     $("#gantt").innerHTML = ganttChart(true);
     return;
   }
+  if (tab === "timeline") {
+    const history = state.timeline.filter(filtered);
+    const schedule = ["workstreams", "milestones"].flatMap((collection) =>
+      state[collection].filter(filtered).map((record) => ({ record, collection }))
+    ).sort((a, b) => byTargetDate(a.record, b.record));
+    $("#records").innerHTML = `
+      <div class="section-heading"><h2>Project history</h2></div>
+      ${history.length ? `<div class="timeline-list">${history.map((record) => card(record, "timeline")).join("")}</div>` : '<p class="empty">No matching history entries.</p>'}
+      <div class="section-heading"><h2>Workstreams & milestones</h2></div>
+      <p class="hint">Automatically linked to the original items. Earliest target dates first; undated items last.</p>
+      ${schedule.length ? `<div class="timeline-list">${schedule.map(({ record, collection }) => card(record, collection, true)).join("")}</div>` : '<p class="empty">No matching workstreams or milestones.</p>'}`;
+    $("#result-count").textContent = `${history.length + schedule.length} items`;
+    return;
+  }
   let count = 0;
   const html = collectionsForTab().map((collection) => {
     const records = state[collection].filter(filtered);
+    if (collection === "workstreams" || collection === "milestones") records.sort(byTargetDate);
     count += records.length;
     const heading = tab === "governance" ? `<div class="section-heading"><h2>${collection === "decisions" ? "Decisions & open choices" : "Risks & dependencies"}</h2>${EDITABLE ? `<button data-add="${collection}">+ Add ${collection === "risks" ? "risk" : "decision"}</button>` : ""}</div>` : "";
     return heading + (records.length ? `<div class="${collection === "timeline" ? "timeline-list" : "record-grid"}">${records.map((record) => card(record, collection)).join("")}</div>` : `<p class="empty">No matching items. ${EDITABLE ? "Clear filters or add a new item." : "Try clearing the filters."}</p>`);
@@ -289,6 +326,19 @@ function render() {
   $("#edit-project").hidden = !EDITABLE || tab !== "overview";
   $("#add-record").hidden = !EDITABLE || !COLLECTIONS.includes(tab);
   $("#snapshot-label").textContent = state.project.snapshot ? dateLabel(state.project.snapshot) : "not set";
+  const isPeople = tab === "people";
+  const statuses = statusesFor(tab);
+  const statusFilter = $("#status-filter");
+  const selectedStatus = statusFilter.value;
+  statusFilter.innerHTML = options(statuses, isPeople ? "All activity statuses" : "All statuses");
+  if (statuses.includes(selectedStatus)) statusFilter.value = selectedStatus;
+  statusFilter.setAttribute("aria-label", isPeople ? "Filter by activity status" : "Filter by status");
+  $("#owner-filter").hidden = isPeople;
+  const priorityFilter = $("#priority-filter");
+  const selectedPriority = priorityFilter.value;
+  priorityFilter.innerHTML = options(PRIORITIES, isPeople ? "All bus risk levels" : "All priorities");
+  priorityFilter.value = selectedPriority;
+  priorityFilter.setAttribute("aria-label", isPeople ? "Filter by bus risk" : "Filter by priority");
   refreshOwnerFilter();
   if (tab === "people") renderPersonSchedule();
   if (tab === "overview") renderOverview();
@@ -305,11 +355,29 @@ function goTo(next) {
 }
 function openEditor(collection, id = null) {
   if (!requireEditing()) return;
-  const record = id ? state[collection].find((item) => item.id === id) : { title: "", owner: "", status: "Planned", priority: "Medium", due: "", detail: "", source: "", evidence: "User update" };
+  const record = id ? state[collection].find((item) => item.id === id) : { title: "", owner: "", status: collection === "people" ? "Observer" : "Planned", priority: "Medium", due: "", detail: "", source: "", evidence: "User update" };
   editorContext = { collection, id };
   $("#editor-title").textContent = id ? `Edit ${collection === "people" ? "person" : "item"}` : `Add to ${collection}`;
   $("#delete-record").hidden = !id;
   const form = $("#edit-form");
+  const isPerson = collection === "people";
+  const hideReferences = isPerson || collection === "infrastructure";
+  $("#owner-field").hidden = isPerson;
+  $("#due-field").hidden = hideReferences;
+  form.elements.owner.disabled = isPerson;
+  form.elements.due.disabled = hideReferences;
+  $("#status-label").textContent = isPerson ? "Activity Status" : "Status";
+  $("#priority-label").textContent = isPerson ? "Bus risk" : "Priority";
+  form.elements.status.innerHTML = options(statusesFor(collection));
+  $("#evidence-field").hidden = hideReferences;
+  $("#source-field").hidden = hideReferences;
+  form.elements.evidence.disabled = hideReferences;
+  form.elements.source.disabled = hideReferences;
+  $("#detail-label").textContent = isPerson ? "Bio / responsibilities" : "Details / progress notes";
+  $("#editor-hint").textContent = isPerson
+    ? 'zTFTz membership follows redshift, spectroscopic or calibration-sample definition, construction or compilation responsibilities in the bio, or an explicit "Member of zTFTz" statement.'
+    : collection === "infrastructure" ? "Track usage or development status, ownership and progress notes."
+    : 'No date means no confirmed deadline. Mark new observations as "User update"; retain source references for traceability.';
   $("#start-field").hidden = collection !== "workstreams";
   form.elements.start.disabled = collection !== "workstreams";
   form.elements.start.value = record.start || "";
@@ -337,7 +405,10 @@ function validateImport(data) {
   for (const collection of COLLECTIONS) {
     if (!Array.isArray(data[collection]) || data[collection].length > 1000) throw new Error(`Invalid ${collection} collection.`);
     for (const record of data[collection]) {
-      if (!record || JSON.stringify(Object.keys(record).filter((key) => key !== "start").sort()) !== JSON.stringify(recordKeys) || Object.values(record).some((value) => typeof value !== "string" || value.length > 20000) || !record.title.trim() || !record.id || ids.has(record.id) || !STATUSES.includes(record.status) || !PRIORITIES.includes(record.priority) || !EVIDENCE.includes(record.evidence) || !validDate(record.due) || !validDate(record.start || "") || (record.start && record.due && record.start > record.due) || (record.source && !Object.hasOwn(SOURCE_DESCRIPTIONS, record.source))) throw new Error(`Invalid record in ${collection}.`);
+      if (collection === "people" && record && STATUSES.includes(record.status)) record.status = "Observer";
+      if (collection === "infrastructure" && record && Object.hasOwn(LEGACY_INFRASTRUCTURE_STATUSES, record.status)) record.status = LEGACY_INFRASTRUCTURE_STATUSES[record.status];
+      const statuses = statusesFor(collection);
+      if (!record || JSON.stringify(Object.keys(record).filter((key) => key !== "start").sort()) !== JSON.stringify(recordKeys) || Object.values(record).some((value) => typeof value !== "string" || value.length > 20000) || !record.title.trim() || !record.id || ids.has(record.id) || !statuses.includes(record.status) || !PRIORITIES.includes(record.priority) || !EVIDENCE.includes(record.evidence) || !validDate(record.due) || !validDate(record.start || "") || (record.start && record.due && record.start > record.due) || (record.source && !Object.hasOwn(SOURCE_DESCRIPTIONS, record.source))) throw new Error(`Invalid record in ${collection}.`);
       ids.add(record.id);
     }
   }
@@ -421,6 +492,14 @@ async function init() {
       record.id = editorContext.id || crypto.randomUUID();
       const records = state[editorContext.collection];
       const index = records.findIndex((item) => item.id === record.id);
+      if (editorContext.collection === "people" || editorContext.collection === "infrastructure") {
+        const existing = records[index];
+        if (editorContext.collection === "people") record.owner = existing ? existing.owner : "";
+        record.due = existing ? existing.due : "";
+        record.evidence = existing ? existing.evidence : "User update";
+        record.source = existing ? existing.source : "";
+        if (existing && existing.start !== undefined) record.start = existing.start;
+      }
       if (index < 0) records.push(record);
       else records[index] = record;
       $("#editor").close();
