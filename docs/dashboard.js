@@ -33,6 +33,7 @@ let generation = 0;
 let editorContext = null;
 let sourceList = [];
 let contributions = [];
+let selectedPersonId = null;
 const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
 const slug = (value) => value.toLowerCase().replaceAll(" ", "-");
@@ -149,14 +150,37 @@ function renderOverview() {
     <div class="notice"><strong>Production boundary:</strong> only SGS can produce Consortium- and ESA-endorsed products. CosmoPipe and other tools support analysis and validation.</div>
     <div class="caveats"><strong>How to read this dashboard</strong><p>${escapeHtml(state.project.caveats)}</p></div>`;
 }
-function ganttChart(applyFilters) {
+function assignedToPerson(record, person) {
+  const normalize = (value) => value.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const owner = ` ${normalize(record.owner)} `;
+  const name = normalize(person.title);
+  const names = name === "will hartley" || name === "william hartley" ? ["will hartley", "william hartley"] : [name];
+  return owner.includes(" ztf ") || names.some((candidate) => candidate && owner.includes(` ${candidate} `));
+}
+function renderPersonSchedule() {
+  const people = [...state.people].sort((a, b) => a.title.localeCompare(b.title));
+  const person = people.find((item) => item.id === selectedPersonId) || state.people[0];
+  const select = $("#schedule-person");
+  select.innerHTML = people.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join("");
+  select.disabled = !person;
+  selectedPersonId = person ? person.id : null;
+  if (!person) {
+    select.innerHTML = '<option>No team members</option>';
+    $("#person-gantt").innerHTML = '<p class="empty">No team members are available for a personal schedule.</p>';
+    return;
+  }
+  select.value = person.id;
+  $("#person-gantt").innerHTML = ganttChart(false, person);
+}
+function ganttChart(applyFilters, person = null) {
   const items = ["workstreams", "milestones"].flatMap((collection) => state[collection].map((record) => ({ record, collection })))
-    .filter(({ record }) => !applyFilters || filtered(record));
+    .filter(({ record }) => (!applyFilters || filtered(record)) && (!person || assignedToPerson(record, person)));
   const dated = items.filter(({ record }) => record.start || record.due)
     .sort((a, b) => (a.record.start || a.record.due).localeCompare(b.record.start || b.record.due));
   const unscheduled = items.filter(({ record }) => !record.start && !record.due);
-  const heading = `<div class="panel-heading"><h2>Delivery schedule</h2>${applyFilters ? (EDITABLE ? '<div><button data-add="workstreams">+ Workstream</button> <button data-add="milestones">+ Milestone</button></div>' : "") : '<button data-goto="gantt">Open Gantt view &rarr;</button>'}</div>`;
+  const heading = `<div class="panel-heading"><h2>${person ? `${escapeHtml(person.title)}: workstreams & milestones` : "Delivery schedule"}</h2>${person ? "" : applyFilters ? (EDITABLE ? '<div><button data-add="workstreams">+ Workstream</button> <button data-add="milestones">+ Milestone</button></div>' : "") : '<button data-goto="gantt">Open Gantt view &rarr;</button>'}</div>`;
   let chart = `<p class="empty">${EDITABLE ? "No dated items. Set workstream start/target dates or milestone targets to build the chart." : "No dated items in this published snapshot."}</p>`;
+  if (person && !items.length) chart = `<p class="empty">No workstreams or milestones are assigned to ${escapeHtml(person.title)}.</p>`;
   if (dated.length) {
     const parse = (value) => Date.parse(`${value}T00:00:00Z`);
     const dates = dated.flatMap(({ record }) => [record.start, record.due].filter(Boolean)).map(parse);
@@ -259,12 +283,14 @@ function render() {
   $("#overview").hidden = tab !== "overview";
   $("#sources").hidden = tab !== "sources";
   $("#gantt").hidden = tab !== "gantt";
+  $("#person-schedule").hidden = tab !== "people";
   $("#filters").hidden = !collectionsForTab().length;
   $("#records").hidden = !collectionsForTab().length || tab === "gantt";
   $("#edit-project").hidden = !EDITABLE || tab !== "overview";
   $("#add-record").hidden = !EDITABLE || !COLLECTIONS.includes(tab);
   $("#snapshot-label").textContent = state.project.snapshot ? dateLabel(state.project.snapshot) : "not set";
   refreshOwnerFilter();
+  if (tab === "people") renderPersonSchedule();
   if (tab === "overview") renderOverview();
   else if (tab === "sources") renderSources();
   else renderRecords();
@@ -429,6 +455,10 @@ async function init() {
     $("#retry").addEventListener("click", persist);
   }
   $("#search").addEventListener("input", renderRecords);
+  $("#schedule-person").addEventListener("change", (event) => {
+    selectedPersonId = event.target.value;
+    renderPersonSchedule();
+  });
   for (const selector of ["#status-filter", "#owner-filter", "#priority-filter"]) $(selector).addEventListener("change", renderRecords);
   $("#export").addEventListener("click", exportState);
   window.addEventListener("beforeunload", (event) => {

@@ -31,6 +31,13 @@
     <div id="app" hidden>
       <section class="page-heading"><div><p class="eyebrow" id="section-kicker">PROJECT AT A GLANCE</p><h1 id="section-title">Overview</h1><p id="section-subtitle"></p></div><button id="add-record" class="primary" hidden>+ Add item</button><button id="edit-project">Edit project overview</button></section>
       <section id="overview"></section>
+      <section id="person-schedule" hidden>
+        <div class="person-schedule-controls">
+          <div><h2>Personal schedule</h2><p class="hint">Named and shared-owner assignments, plus zTF-wide items. Unassigned items are excluded. Team-list filters below do not affect this chart.</p></div>
+          <label for="schedule-person">Person<select id="schedule-person"></select></label>
+        </div>
+        <div id="person-gantt"></div>
+      </section>
       <section id="filters" class="filters" hidden>
         <input id="search" type="search" placeholder="Search titles, people, notes..." aria-label="Search records">
         <select id="status-filter" aria-label="Filter by status"><option value="">All statuses</option></select>
