@@ -21,6 +21,7 @@
       <button data-tab="timeline"><span>07</span> Project timeline</button>
       <button data-tab="sources"><span>08</span> Sources & activity</button>
       <button data-tab="gantt"><span>09</span> Gantt chart</button>
+      <button data-tab="products"><span>10</span> Data products</button>
     </nav>
     <div class="sidebar-bottom"><span class="live-dot"></span> <span id="workspace-label">LOCAL WORKSPACE</span><p id="workspace-description">Saved in this folder.<br>No external services.</p><div id="save-status" role="status" aria-live="polite">Connecting...</div></div>
   </aside>
@@ -48,13 +49,19 @@
       <section id="records"></section>
       <section id="gantt" hidden></section>
       <section id="sources" hidden></section>
+      <section id="products" hidden></section>
       <footer>Source snapshot <span id="snapshot-label"></span> <span>&middot;</span> <span id="snapshot-note">Dates and initial statuses require confirmation. Original source files are read-only.</span></footer>
     </div>
   </main>
   <dialog id="editor">
     <form id="edit-form">
       <div class="dialog-heading"><div><p class="eyebrow">UPDATE THE WORKSPACE</p><h2 id="editor-title">Edit item</h2></div><button type="button" data-close="editor" aria-label="Close editor" class="icon-button">&times;</button></div>
+      <p id="editor-error" class="error" role="alert" hidden></p>
       <label>Title<input name="title" required maxlength="20000"></label>
+      <div id="workflow-fields" class="form-grid" hidden>
+        <label>Workflow type<select name="workflow_type" disabled><option>Project</option><option>Umbrella</option></select></label>
+        <label>Umbrella workflow<select name="parent_id" disabled></select></label>
+      </div>
       <div class="form-grid">
         <label id="owner-field">Owner / responsible people<input name="owner" placeholder="Unassigned" maxlength="20000"></label>
         <label><span id="status-label">Status</span><select name="status"></select></label>

@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "revision": 80,
-  "updated_at": "2026-11-03T08:27:20.590405+00:00",
+  "revision": 92,
+  "updated_at": "2026-11-11T08:00:44.108856+00:00",
   "project": {
     "title": "Redshift calibration task force",
     "summary": "Prepare robust Euclid DR1 redshift distributions and prior uncertainties for weak lensing, galaxy clustering and 2D mass mapping. Compare real data, Flagship2 and SHECAL; validate calibration-sample coverage, transfer functions and the shift-and-stretch uncertainty model.",
@@ -45,7 +45,8 @@
       "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
       "detail": "FS2_as_DR1 shear tomographic bins reproduce data N(z) and clustering amplitude well; position samples are less well matched. Investigate pruning high-z shear bins and finalise shape/position samples for validation.",
-      "id": "w-fswide"
+      "id": "w-fswide",
+      "parent_id": "u-fs2"
     },
     {
       "title": "Build realistic FS2 AUX / redshift mocks",
@@ -57,19 +58,21 @@
       "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
       "detail": "Tyann volunteered for the Deep-mock photometric side. Francisco needs AUX photometry and error catalogues to transform FS2. Apply SSI-calibrated Deep selections (COSMOS exists; extend to CDFS). Realistic redshift-calibrator selection, incompleteness and failure rates remain the harder unresolved task; ownership of this part needs confirmation.",
-      "id": "w-deep"
+      "id": "w-deep",
+      "parent_id": "u-fs2"
     },
     {
-      "title": "Cross-validate SGS and CosmoPipe on SHECAL",
-      "owner": "Angus Wright, Will Hartley",
+      "title": "Validate SGS on SHECAL and compare with CosmoPipe",
+      "owner": "Will Hartley",
       "status": "Planned",
       "priority": "High",
       "due": "2027-01-29",
       "start": "2026-11-20",
       "evidence": "User update",
       "source": "ou-phz-ztf_summary_6months.txt",
-      "detail": "Run data Deep/calibration samples against SHECAL wide simulations as the baseline; compare estimated N(z) with truth and SGS outputs. Use FS2 AUX catalogue-space or SSI mocks to test the impact of cross-calibration. Execution status and simulation availability need confirmation.",
-      "id": "w-shecal"
+      "detail": "SGS work package: run and validate the SGS outputs on SHECAL and coordinate the comparison with CosmoPipe.\n\nSplit from shared workflow: Cross-validate SGS and CosmoPipe on SHECAL. Original notes retained for context (not all methods apply to this pipeline):\n\nRun data Deep/calibration samples against SHECAL wide simulations as the baseline; compare estimated N(z) with truth and SGS outputs. Use FS2 AUX catalogue-space or SSI mocks to test the impact of cross-calibration. Execution status and simulation availability need confirmation.",
+      "id": "w-shecal",
+      "parent_id": "u-sgs"
     },
     {
       "title": "Synthetic source injection and transfer-function tests",
@@ -81,7 +84,8 @@
       "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
       "detail": "DR1-like Wide, Deep and WideFromDeep mock products \nOngoing Investigations: \n- impact of missing Deep calibrators\n- impact of crowded-field shredding\n- impact of systematic photometric errors. \nSSI transfer-function alternative is a validation route; pipeline adoption for DR1 is not possible.",
-      "id": "w-ssi"
+      "id": "w-ssi",
+      "parent_id": "u-cosmopipe"
     },
     {
       "id": "w-datacal",
@@ -92,64 +96,172 @@
       "due": "",
       "detail": "Use SSI to define T_DataCalRescal, then rerun N(z) without changing the Euclid pipeline. Bright-source error underestimation is reported as the main issue, not non-Gaussianity. EXT object shot noise is absent in DR1 errors and SSI runs; planned for DR2.",
       "source": "ou-phz-ztf_summary_6months.txt",
-      "evidence": "Reported"
+      "evidence": "Reported",
+      "parent_id": "u-cosmopipe"
     },
     {
-      "title": "Test redshift-sample and completeness weighting",
-      "owner": "Angus Wright, Will Hartley, Giulia Giannini, Tyann Dumerchat",
+      "title": "Test DES 3sDIR redshift-sample weighting for SGS",
+      "owner": "Will Hartley, Giulia Giannini",
       "status": "In progress",
       "priority": "High",
       "due": "2027-02-12",
       "start": "2026-11-02",
-      "evidence": "Reported",
+      "evidence": "User update",
       "source": "Project_Activity.txt",
-      "detail": "KiDS-Legacy Prior Volume weighting: Angus. DES Y3/Y6 3sDIR weighting: Will and Giulia. Compare f_c variants, cosmic variance, bias and effective sample size. Any wide-sample weighting needs consistent CS/GGL/GC/clustering-z bookkeeping. PHZ_WEIGHT use is DR2 work, not a confirmed DR1 implementation.",
-      "id": "w-weight"
+      "detail": "SGS work package: evaluate DES Y3/Y6 3sDIR weighting, led by Will Hartley and Giulia Giannini. Evaluation does not imply adoption in SGS.\n\nSplit from shared workflow: Test redshift-sample and completeness weighting. Original notes retained for context (not all methods apply to this pipeline):\n\nKiDS-Legacy Prior Volume weighting: Angus. DES Y3/Y6 3sDIR weighting: Will and Giulia. Compare f_c variants, cosmic variance, bias and effective sample size. Any wide-sample weighting needs consistent CS/GGL/GC/clustering-z bookkeeping. PHZ_WEIGHT use is DR2 work, not a confirmed DR1 implementation.",
+      "id": "w-weight",
+      "parent_id": "u-sgs"
     },
     {
-      "title": "Augment Deep SOM coverage",
-      "owner": "Dan Masters, Yu-Heng Lin, Angus Wright",
+      "title": "Evaluate Deep SOM coverage augmentation for SGS SOM",
+      "workflow_type": "Project",
+      "parent_id": "u-sgs",
+      "owner": "Dan Masters, Yu-Heng Lin, Angus Wright, Yun-Hao Zhang",
       "status": "In progress",
       "priority": "Medium",
       "due": "2027-01-31",
       "start": "2026-11-03",
-      "evidence": "Reported",
+      "evidence": "User update",
       "source": "Project_Activity.txt",
-      "detail": "Linear interpolation / inpainting of empty Deep SOM cells: Dan and Yu-Heng. Clustering SOM cells to improve coverage: Angus. Quantify changes in coverage and redshift bias before adopting a method.",
+      "detail": "SGS work package: evaluate Deep SOM augmentation methods for SGS. Adoption remains subject to validation; the original methodological collaborators are retained.\n\nSplit from shared workflow: Augment Deep SOM coverage. Original notes retained for context (not all methods apply to this pipeline):\n\nLinear interpolation / inpainting of empty Deep SOM cells: Dan and Yu-Heng. Clustering SOM cells to improve coverage: Angus. Quantify changes in coverage and redshift bias before adopting a method.",
       "id": "w-som"
     },
     {
-      "id": "w-cc",
       "title": "Clustering-z validation with SPHEREx and DESI",
-      "owner": "Martine Campbell",
+      "workflow_type": "Project",
+      "parent_id": "",
+      "owner": "Martine Campbell, William d'Assignies",
       "status": "In progress",
-      "priority": "High",
-      "due": "",
-      "detail": "SPHEREx clustering-z validation has started; calibration-sample work awaits data permissions. Martine's documented code is private and available on request. Coordinate external checks with the final calibration sample and any selection changes.",
+      "priority": "Medium",
+      "due": "2027-03-31",
+      "start": "2026-11-01",
+      "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
-      "evidence": "Reported"
+      "detail": "SPHEREx clustering-z validation has started; calibration-sample work awaits data permissions. Martine's documented code is private and available on request. Coordinate external checks with the final calibration sample and any selection changes.",
+      "id": "w-cc"
     },
     {
       "title": "Validate shift-and-stretch priors in the likelihood",
-      "owner": "William D'Assignies, Tyann Dumerchat, Jaime Ruiz-Zapatero",
+      "workflow_type": "Project",
+      "parent_id": "",
+      "owner": "William D'Assignies, Tyann Dumerchat, Jaime Ruiz-Zapatero, , Yun-Hao Zhang",
       "status": "Planned",
       "priority": "High",
-      "due": "",
+      "due": "2027-02-01",
+      "start": "2026-11-01",
       "evidence": "Proposed follow-up",
       "source": "ou-phz-ztf_summary_6months.txt",
       "detail": "Compare fitted parameters with moment-based estimates, asymmetric tails and cosmological recovery. Up to approximately 0.5 sigma biases were reported for moment statistics; inflated priors did not always recover unbiased cosmology. Request for 50-100 realisations is not an agreed requirement.",
       "id": "w-fit"
     },
     {
-      "id": "w-shearratio",
       "title": "Construct lens samples for shear-ratio validation",
-      "owner": "Alex Alarcon",
+      "workflow_type": "Project",
+      "parent_id": "",
+      "owner": "Alex Alarcon, , Yun-Hao Zhang",
       "status": "In progress",
       "priority": "Medium",
-      "due": "",
-      "detail": "DR1 KP shear-ratio implementation needs low-z lens samples with narrow N(z), sufficient density and minimal overlap with source samples. Explore Calum's sample and Euclid plus ground photometry; use RR2 shear-ratio measurements as a comparison.",
+      "due": "2027-01-14",
+      "start": "2026-11-01",
+      "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
-      "evidence": "Reported"
+      "detail": "DR1 KP shear-ratio implementation needs low-z lens samples with narrow N(z), sufficient density and minimal overlap with source samples. Explore Calum's sample and Euclid plus ground photometry; use RR2 shear-ratio measurements as a comparison.",
+      "id": "w-shearratio"
+    },
+    {
+      "title": "SGS Pipeline Developement",
+      "workflow_type": "Umbrella",
+      "owner": "Will Hartley",
+      "status": "In progress",
+      "priority": "High",
+      "due": "2027-02-01",
+      "start": "2026-11-01",
+      "evidence": "User update",
+      "source": "Project_Activity.txt",
+      "detail": "SGS pipeline implementation and validation. SGS remains the only Consortium- and ESA-endorsed production route. Grouping experimental methodology here does not confirm its adoption.",
+      "id": "u-sgs",
+      "parent_id": ""
+    },
+    {
+      "title": "CosmoPipe Pipeline Development",
+      "workflow_type": "Umbrella",
+      "owner": "Angus Wright",
+      "status": "In progress",
+      "priority": "High",
+      "due": "2027-02-01",
+      "start": "2026-11-01",
+      "evidence": "User update",
+      "source": "Project_Activity.txt",
+      "detail": "CosmoPipe implementation, methodological development and offline validation. This is not an alternative endorsed-product production route.",
+      "id": "u-cosmopipe",
+      "parent_id": ""
+    },
+    {
+      "title": "Flagship2 Development",
+      "workflow_type": "Umbrella",
+      "owner": "Francisco Castander",
+      "status": "In progress",
+      "priority": "High",
+      "due": "2026-11-30",
+      "start": "2026-11-01",
+      "evidence": "User update",
+      "source": "Project_Activity.txt",
+      "detail": "Development of Flagship2 wide samples and realistic Deep/AUX and redshift mocks for pipeline validation.",
+      "id": "u-fs2",
+      "parent_id": ""
+    },
+    {
+      "title": "Validate CosmoPipe on SHECAL and compare with SGS",
+      "owner": "Angus Wright",
+      "status": "Planned",
+      "priority": "High",
+      "due": "2027-01-29",
+      "start": "2026-11-20",
+      "evidence": "User update",
+      "source": "ou-phz-ztf_summary_6months.txt",
+      "detail": "CosmoPipe work package: run and validate CosmoPipe on SHECAL and coordinate the comparison with SGS.\n\nSplit from shared workflow: Cross-validate SGS and CosmoPipe on SHECAL. Original notes retained for context (not all methods apply to this pipeline):\n\nRun data Deep/calibration samples against SHECAL wide simulations as the baseline; compare estimated N(z) with truth and SGS outputs. Use FS2 AUX catalogue-space or SSI mocks to test the impact of cross-calibration. Execution status and simulation availability need confirmation.",
+      "id": "w-shecal-cosmopipe",
+      "parent_id": "u-cosmopipe"
+    },
+    {
+      "title": "Test KiDS-Legacy Prior Volume redshift-sample weighting in CosmoPipe",
+      "owner": "Angus Wright",
+      "status": "In progress",
+      "priority": "High",
+      "due": "2027-02-12",
+      "start": "2026-11-02",
+      "evidence": "User update",
+      "source": "Project_Activity.txt",
+      "detail": "CosmoPipe work package: evaluate KiDS-Legacy Prior Volume weighting, led by Angus Wright.\n\nSplit from shared workflow: Test redshift-sample and completeness weighting. Original notes retained for context (not all methods apply to this pipeline):\n\nKiDS-Legacy Prior Volume weighting: Angus. DES Y3/Y6 3sDIR weighting: Will and Giulia. Compare f_c variants, cosmic variance, bias and effective sample size. Any wide-sample weighting needs consistent CS/GGL/GC/clustering-z bookkeeping. PHZ_WEIGHT use is DR2 work, not a confirmed DR1 implementation.",
+      "id": "w-weight-cosmopipe",
+      "parent_id": "u-cosmopipe"
+    },
+    {
+      "title": "Augment CosmoPipe Deep SOM coverage",
+      "owner": "Dan Masters, Yu-Heng Lin, Angus Wright",
+      "status": "In progress",
+      "priority": "Medium",
+      "due": "2027-01-31",
+      "start": "2026-11-03",
+      "evidence": "User update",
+      "source": "Project_Activity.txt",
+      "detail": "CosmoPipe work package: evaluate and implement Deep SOM coverage augmentation in CosmoPipe. The original methodological collaborators are retained.\n\nSplit from shared workflow: Augment Deep SOM coverage. Original notes retained for context (not all methods apply to this pipeline):\n\nLinear interpolation / inpainting of empty Deep SOM cells: Dan and Yu-Heng. Clustering SOM cells to improve coverage: Angus. Quantify changes in coverage and redshift bias before adopting a method.",
+      "id": "w-som-cosmopipe",
+      "parent_id": "u-cosmopipe"
+    },
+    {
+      "title": "CosmoPipe N(z) Pipeline v0.1 Delivery",
+      "workflow_type": "Project",
+      "parent_id": "u-cosmopipe",
+      "owner": "Angus Wright",
+      "status": "Complete",
+      "priority": "High",
+      "due": "2026-11-09",
+      "start": "2026-11-01",
+      "evidence": "User update",
+      "source": "",
+      "detail": "Provide an initial testing version of the CosmoPipe Nz estimation infrastructure to interested KP leads",
+      "id": "1d2ca2fd-3f5d-4f8a-bbaa-de8df240f2da"
     }
   ],
   "milestones": [
@@ -368,7 +480,7 @@
       "title": "Yuzheng Kang",
       "status": "Observer",
       "priority": "Low",
-      "detail": "Data-driven photometry mocking / sample-noising method is a fundamental pipeline component. Current assignment not specified in the roster.",
+      "detail": "Data-driven photometry mocking / sample-noising method is a fundamental pipeline component. Current assignment not specified in the roster. Member of the zTFTz. ",
       "id": "p-yuzheng",
       "owner": "",
       "due": "",
@@ -462,6 +574,17 @@
       "due": "",
       "evidence": "Reported",
       "source": "Project_Activity.txt"
+    },
+    {
+      "title": "Stephane Paltani",
+      "status": "Observer",
+      "priority": "Medium",
+      "detail": "",
+      "id": "2c578562-988b-4f90-90c6-ebc4801857dc",
+      "owner": "",
+      "due": "",
+      "evidence": "User update",
+      "source": ""
     }
   ],
   "infrastructure": [

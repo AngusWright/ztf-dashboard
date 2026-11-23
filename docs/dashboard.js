@@ -14,6 +14,17 @@ const LEGACY_INFRASTRUCTURE_STATUSES = {
 const PRIORITIES = ["High", "Medium", "Low"];
 const EVIDENCE = ["Reported", "Proposed follow-up", "User update"];
 const COLLECTIONS = ["workstreams", "milestones", "people", "infrastructure", "decisions", "risks", "timeline"];
+const PRODUCT_DATASETS = ["Euclid Data", "FS2", "SHECAL"];
+const DATA_PRODUCTS = [
+  { id: "deep-photometry", title: "Deep AUX photometry", match: (text) => /\b(?:deep|aux)\b/.test(text) && /\b(?:photometr\w*|mocks?|catalogues?)\b/.test(text) && !/\bsoms?\b/.test(text) },
+  { id: "redshift", title: "Redshift samples", match: (text) => /\bredshift\b.*\b(?:samples?|mocks?)\b/.test(text) },
+  { id: "wide-wl", title: "Wide photometry for WL", sample: "WL", match: (text) => /\bwide\b/.test(text) && /\b(?:photometr\w*|samples?|catalogues?)\b/.test(text) && !/\b(?:soms?|transfer)\b/.test(text) },
+  { id: "wide-gc", title: "Wide photometry for GC", sample: "GC", match: (text) => /\bwide\b/.test(text) && /\b(?:photometr\w*|samples?|catalogues?)\b/.test(text) && !/\b(?:soms?|transfer)\b/.test(text) },
+  { id: "transfer-wl", title: "Transfer function for WL", sample: "WL", match: (text) => /\btransfer functions?\b/.test(text) },
+  { id: "transfer-gc", title: "Transfer function for GC", sample: "GC", match: (text) => /\btransfer functions?\b/.test(text) },
+  { id: "deep-som", title: "Deep SOM", match: (text) => /\b(?:deep|aux)\b.*\bsoms?\b/.test(text) },
+  { id: "wide-som", title: "Wide SOM", match: (text) => /\bwide\b.*\bsoms?\b/.test(text) }
+];
 const SOURCE_DESCRIPTIONS = {
   "Infrastructure.txt": "Capabilities, supported samples and the endorsed production route.",
   "Personnel.txt": "Initial 16-person roster; role fields are empty in the source.",
@@ -31,6 +42,7 @@ const TAB_INFO = {
   governance: ["ASSUMPTIONS & DEPENDENCIES", "Decisions & risks", "Distinguish the reported baseline from unresolved methodological choices."],
   timeline: ["PROJECT HISTORY & SCHEDULE", "Project timeline", "Project history plus live workstreams and milestones, ordered by target date; undated items appear last."],
   gantt: ["SCHEDULE & HANDOFFS", "Gantt chart", "Workstream schedules and dated milestones. Click a row to edit its dates and progress."],
+  products: ["DELIVERABLES & RESPONSIBILITY", "Data products", "Eight products across Euclid Data, FS2 and SHECAL, linked to the current workstreams and milestones."],
   sources: ["EVIDENCE & CONTEXT", "Sources & activity", "Read the six original files. Activity counts are not responsibility or performance metrics."]
 };
 let state;
@@ -49,6 +61,8 @@ const slug = (value) => value.toLowerCase().replaceAll(" ", "-");
 const options = (values, blank = null) => (blank === null ? "" : `<option value="">${escapeHtml(blank)}</option>`) + values.map((value) => `<option>${escapeHtml(value)}</option>`).join("");
 const statusesFor = (collection) => collection === "people" ? ACTIVITY_STATUSES : collection === "infrastructure" ? INFRASTRUCTURE_STATUSES : STATUSES;
 const byTargetDate = (a, b) => a.due && b.due ? a.due.localeCompare(b.due) : a.due ? -1 : b.due ? 1 : 0;
+const isUmbrella = (record) => record.workflow_type === "Umbrella";
+const workflowParent = (record) => state.workstreams.find((item) => item.id === record.parent_id);
 const dateLabel = (value) => value ? new Date(`${value}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "Not set";
 function daysTo(value) {
   const today = new Date();
@@ -64,9 +78,9 @@ function dueLabel(record) {
 function badge(status) {
   return `<span class="badge status-${slug(status)}">${escapeHtml(status)}</span>`;
 }
-function showError(message) {
-  $("#error").textContent = message;
-  $("#error").hidden = false;
+function showError(message, selector = "#error") {
+  $(selector).textContent = message;
+  $(selector).hidden = false;
 }
 function clearError() {
   $("#error").hidden = true;
@@ -125,10 +139,12 @@ async function persist() {
 }
 function card(record, collection, showType = false) {
   const hideReferences = collection === "people" || collection === "infrastructure";
+  const parent = collection === "workstreams" ? workflowParent(record) : null;
   return `<article class="card">
     <div class="card-head"><h3>${escapeHtml(record.title)}</h3>${EDITABLE ? `<button data-edit="${escapeHtml(record.id)}" data-collection="${collection}">Edit</button>` : ""}</div>
     <div class="tags">${showType ? `<span class="badge">${collection === "workstreams" ? "Workstream" : "Milestone"}</span>` : ""}${badge(record.status)}<span class="badge priority-${slug(record.priority)}">${collection === "people" ? `Bus risk: ${escapeHtml(record.priority)}` : `${escapeHtml(record.priority)} priority`}</span>${collection === "people" ? (isRedshiftSampleTeam(record) ? '<span class="badge">zTFTz</span>' : "") : hideReferences ? "" : `<span class="badge">${escapeHtml(record.evidence)}</span>`}</div>
     <p class="card-detail">${escapeHtml(record.detail)}</p>
+    ${collection === "workstreams" && isUmbrella(record) ? '<p class="hint">Umbrella workflow</p>' : parent ? `<p class="hint">Umbrella: ${escapeHtml(parent.title)}</p>` : ""}
     ${collection === "people" ? "" : `<div class="record-meta">${collection === "timeline" ? "" : `<span>Owner <strong>${escapeHtml(record.owner || "Unassigned")}</strong></span>`}${hideReferences ? "" : `${record.start ? `<span>Start <strong>${escapeHtml(dateLabel(record.start))}</strong></span>` : ""}${dueLabel(record)}`}</div>`}
     ${!hideReferences && record.source ? `<div class="record-source">${EDITABLE ? `<button class="source-link" data-source="${escapeHtml(record.source)}">${escapeHtml(record.source)}</button>` : `<span class="source-link">Reference: ${escapeHtml(record.source)} (not published)</span>`}</div>` : ""}
   </article>`;
@@ -140,7 +156,7 @@ function panel(title, collection, records) {
   return `<section class="panel"><div class="panel-heading"><h2>${title}</h2><button data-goto="${collection === "risks" ? "governance" : collection}">View all &rarr;</button></div>${records.length ? records.map((record, index) => focusRow(record, collection, index)).join("") : '<p class="empty">No active items.</p>'}</section>`;
 }
 function renderOverview() {
-  const work = state.workstreams;
+  const work = state.workstreams.filter((record) => !isUmbrella(record));
   const done = work.filter((record) => record.status === "Complete").length;
   const active = work.filter((record) => record.status === "In progress").length;
   const highRisks = state.risks.filter((record) => record.priority === "High" && record.status !== "Complete");
@@ -264,7 +280,8 @@ function refreshOwnerFilter() {
 }
 function filtered(record) {
   const query = $("#search").value.trim().toLowerCase();
-  return (!query || [record.title, record.owner, record.detail, record.source, record.evidence].some((value) => value.toLowerCase().includes(query))) &&
+  const parentTitle = tab === "workstreams" ? (workflowParent(record) || {}).title || "" : "";
+  return (!query || [record.title, record.owner, record.detail, record.source, record.evidence, parentTitle].some((value) => value.toLowerCase().includes(query))) &&
     (!$("#status-filter").value || record.status === $("#status-filter").value) &&
     (!$("#owner-filter").value || record.owner === $("#owner-filter").value) &&
     (!$("#priority-filter").value || record.priority === $("#priority-filter").value);
@@ -272,6 +289,23 @@ function filtered(record) {
 function renderRecords() {
   if (tab === "gantt") {
     $("#gantt").innerHTML = ganttChart(true);
+    return;
+  }
+  if (tab === "workstreams") {
+    const projects = state.workstreams.filter((record) => !isUmbrella(record));
+    const groups = state.workstreams.filter((record) => !record.parent_id).map((record) => {
+      const children = isUmbrella(record) ? projects.filter((item) => item.parent_id === record.id).sort(byTargetDate) : [];
+      const matches = children.filter(filtered);
+      return { record, children, matches, due: record.due || (children.find((item) => item.due) || {}).due || "" };
+    }).filter(({ record, matches }) => filtered(record) || matches.length).sort(byTargetDate);
+    $("#records").innerHTML = groups.length ? groups.map(({ record, children, matches }) => isUmbrella(record)
+      ? `<section class="workflow-group" data-umbrella="${escapeHtml(record.id)}">
+          ${card(record, "workstreams")}
+          <div class="section-heading"><h2>Subprojects (${matches.length} / ${children.length})</h2>${EDITABLE ? `<button data-add="workstreams" data-parent="${escapeHtml(record.id)}">+ Add subproject</button>` : ""}</div>
+          ${matches.length ? `<div class="record-grid">${matches.map((item) => card(item, "workstreams")).join("")}</div>` : '<p class="empty">No matching subprojects.</p>'}
+        </section>`
+      : card(record, "workstreams")).join("") : '<p class="empty">No matching workflows. Try clearing the filters.</p>';
+    $("#result-count").textContent = `${projects.filter(filtered).length} projects; ${groups.filter(({ record }) => isUmbrella(record)).length} umbrellas`;
     return;
   }
   if (tab === "timeline") {
@@ -305,6 +339,59 @@ function renderSources() {
     <section class="panel"><div class="panel-heading"><h2>Channel contribution activity</h2><span class="hint">Source: ztf_contributions.tsv</span></div><div class="table-wrap"><table><thead><tr><th>Rank</th><th>Contributor(s)</th><th>Messages / replies</th><th>Reactions</th><th>Total</th></tr></thead><tbody>${contributions.map((row) => `<tr><td>${escapeHtml(row.rank)}</td><td>${escapeHtml(row.name)}</td><td>${escapeHtml(row.messages)}</td><td>${escapeHtml(row.reactions)}</td><td>${escapeHtml(row.total)}${/^\d+$/.test(row.total) && !row.name.includes(",") ? `<progress class="activity-bar" value="${Number(row.total)}" max="171" aria-label="Approximate activity total"></progress>` : ""}</td></tr>`).join("")}</tbody></table></div></section>
     <div class="caveats"><strong>Activity caveats</strong><p>Counts include messages, replies and reactions, are approximate and omit some unread threads. Grouped rows retain their original ranges; no invented individual values. TSV and narrative rankings disagree in places. Sentiment interpretations from contributor profiles are deliberately not presented as project facts.</p></div>`;
 }
+function productReferences(product, dataset) {
+  return ["workstreams", "milestones"].flatMap((collection) => state[collection].flatMap((record) => {
+    const text = normalizeWords(record.title);
+    if (!product.match(text)) return [];
+    const datasets = PRODUCT_DATASETS.filter((name) => {
+      if (name === "Euclid Data") return /\b(?:euclid|real data|data)\b/.test(text);
+      return new RegExp(`\\b${name.toLowerCase()}\\b`).test(text);
+    });
+    if (datasets.length && !datasets.includes(dataset)) return [];
+    const samples = [];
+    if (/\b(?:wl|weak lensing|shear|lensmc|metacal)\b/.test(text)) samples.push("WL");
+    if (/\b(?:gc|galaxy clustering|position)\b/.test(text)) samples.push("GC");
+    if (product.sample && samples.length && !samples.includes(product.sample)) return [];
+    const caveats = [];
+    if (!datasets.length) caveats.push("Dataset not specified");
+    if (product.sample && !samples.length) caveats.push("WL/GC scope not specified");
+    if (!/^(?:build|construct|construction|produce|production|generate|compile|compilation|train|define|finalise|finalize)\b/.test(text) ||
+        /\b(?:test|tests|testing|validation|cross validate|review|weighting|augment)\b/.test(text)) {
+      caveats.push("Related analysis or validation, not a production assignment");
+    }
+    if (product.id === "redshift" && /ownership.*(?:needs|to).*confirm/i.test(record.detail)) {
+      caveats.push("Redshift-production ownership explicitly needs confirmation");
+    }
+    return [{ record, collection, caveats }];
+  })).sort((a, b) => byTargetDate(a.record, b.record));
+}
+function productReference({ record, collection, caveats }) {
+  return `<div class="product-reference">
+    <p><strong>${escapeHtml(record.owner.trim() || "Unassigned")}</strong> <span class="hint">(${collection === "workstreams" ? "workstream" : "milestone"} owner)</span></p>
+    ${caveats.length ? `<p class="hint">${escapeHtml(caveats.join("; "))}.</p>` : ""}
+    ${EDITABLE ? `<button class="source-link" data-edit="${escapeHtml(record.id)}" data-collection="${collection}">${escapeHtml(record.title)}</button>` : `<p>${escapeHtml(record.title)}</p>`}
+    <div class="tags">${badge(record.status)}</div>
+    <details><summary>Record details</summary><p class="card-detail">${escapeHtml(record.detail || "No additional notes.")}</p>${dueLabel(record)}</details>
+  </div>`;
+}
+function renderProducts() {
+  $("#products").innerHTML = `
+    <div class="notice">Owners below come directly from linked workstreams and milestones, not from channel activity or biographies. Matching uses product and dataset names in item titles. Records with unspecified datasets or WL/GC scope are shown as related work, not assignments to all variants. Input mentions in notes do not establish production ownership. ${EDITABLE ? "Edit a linked item to update its owner or clarify its product and dataset in the title." : "This is a read-only published snapshot."}</div>
+    ${DATA_PRODUCTS.map((product) => `<section class="product-group"><div class="section-heading"><h2>${product.title}</h2></div><div class="product-grid">
+      ${PRODUCT_DATASETS.map((dataset) => {
+        const references = productReferences(product, dataset);
+        const assigned = references.filter(({ record, caveats }) => !caveats.length && record.owner.trim());
+        const related = references.filter((reference) => !assigned.includes(reference));
+        return `<article class="card product-card" data-product="${product.id}" data-dataset="${dataset}">
+          <h3>${dataset}</h3>
+          <p class="eyebrow">${assigned.length ? "REPORTED RESPONSIBILITY" : "PRODUCTION OWNER NOT CONFIRMED"}</p>
+          ${assigned.map(productReference).join("")}
+          ${related.length ? `<details class="product-related" open><summary>Related / scope-unconfirmed work (${related.length})</summary>${related.map(productReference).join("")}</details>` : ""}
+          ${!references.length ? '<p class="hint">No matching workstream or milestone currently specifies this product and dataset.</p>' : ""}
+        </article>`;
+      }).join("")}
+    </div></section>`).join("")}`;
+}
 function render() {
   const info = TAB_INFO[tab];
   $("#section-kicker").textContent = info[0];
@@ -320,6 +407,7 @@ function render() {
   $("#overview").hidden = tab !== "overview";
   $("#sources").hidden = tab !== "sources";
   $("#gantt").hidden = tab !== "gantt";
+  $("#products").hidden = tab !== "products";
   $("#person-schedule").hidden = tab !== "people";
   $("#filters").hidden = !collectionsForTab().length;
   $("#records").hidden = !collectionsForTab().length || tab === "gantt";
@@ -343,6 +431,7 @@ function render() {
   if (tab === "people") renderPersonSchedule();
   if (tab === "overview") renderOverview();
   else if (tab === "sources") renderSources();
+  else if (tab === "products") renderProducts();
   else renderRecords();
 }
 function goTo(next) {
@@ -355,11 +444,21 @@ function goTo(next) {
 }
 function openEditor(collection, id = null) {
   if (!requireEditing()) return;
+  $("#editor-error").hidden = true;
   const record = id ? state[collection].find((item) => item.id === id) : { title: "", owner: "", status: collection === "people" ? "Observer" : "Planned", priority: "Medium", due: "", detail: "", source: "", evidence: "User update" };
   editorContext = { collection, id };
   $("#editor-title").textContent = id ? `Edit ${collection === "people" ? "person" : "item"}` : `Add to ${collection}`;
   $("#delete-record").hidden = !id;
   const form = $("#edit-form");
+  const isWorkflow = collection === "workstreams";
+  $("#workflow-fields").hidden = !isWorkflow;
+  form.elements.workflow_type.disabled = !isWorkflow;
+  form.elements.workflow_type.value = record.workflow_type || "Project";
+  form.elements.parent_id.innerHTML = '<option value="">None (standalone)</option>' + state.workstreams
+    .filter((item) => isUmbrella(item) && item.id !== id).sort((a, b) => a.title.localeCompare(b.title))
+    .map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join("");
+  form.elements.parent_id.value = record.parent_id || "";
+  form.elements.parent_id.disabled = !isWorkflow || isUmbrella(record);
   const isPerson = collection === "people";
   const hideReferences = isPerson || collection === "infrastructure";
   $("#owner-field").hidden = isPerson;
@@ -408,8 +507,16 @@ function validateImport(data) {
       if (collection === "people" && record && STATUSES.includes(record.status)) record.status = "Observer";
       if (collection === "infrastructure" && record && Object.hasOwn(LEGACY_INFRASTRUCTURE_STATUSES, record.status)) record.status = LEGACY_INFRASTRUCTURE_STATUSES[record.status];
       const statuses = statusesFor(collection);
-      if (!record || JSON.stringify(Object.keys(record).filter((key) => key !== "start").sort()) !== JSON.stringify(recordKeys) || Object.values(record).some((value) => typeof value !== "string" || value.length > 20000) || !record.title.trim() || !record.id || ids.has(record.id) || !statuses.includes(record.status) || !PRIORITIES.includes(record.priority) || !EVIDENCE.includes(record.evidence) || !validDate(record.due) || !validDate(record.start || "") || (record.start && record.due && record.start > record.due) || (record.source && !Object.hasOwn(SOURCE_DESCRIPTIONS, record.source))) throw new Error(`Invalid record in ${collection}.`);
+      const optional = collection === "workstreams" ? ["start", "workflow_type", "parent_id"] : ["start"];
+      if (!record || JSON.stringify(Object.keys(record).filter((key) => !optional.includes(key)).sort()) !== JSON.stringify(recordKeys) || Object.values(record).some((value) => typeof value !== "string" || value.length > 20000) || !record.title.trim() || !record.id || ids.has(record.id) || !statuses.includes(record.status) || !PRIORITIES.includes(record.priority) || !EVIDENCE.includes(record.evidence) || !validDate(record.due) || !validDate(record.start || "") || (record.start && record.due && record.start > record.due) || (record.source && !Object.hasOwn(SOURCE_DESCRIPTIONS, record.source))) throw new Error(`Invalid record in ${collection}.`);
       ids.add(record.id);
+    }
+  }
+  const workflows = new Map(data.workstreams.map((record) => [record.id, record]));
+  for (const record of workflows.values()) {
+    if (!["Project", "Umbrella"].includes(record.workflow_type ?? "Project") || (isUmbrella(record) && record.parent_id) ||
+        (record.parent_id && (record.parent_id === record.id || !workflows.has(record.parent_id) || !isUmbrella(workflows.get(record.parent_id))))) {
+      throw new Error("Invalid workflow hierarchy: subprojects need an existing umbrella, and umbrellas cannot be nested.");
     }
   }
 }
@@ -465,7 +572,10 @@ async function init() {
         event.preventDefault();
         openEditor(button.dataset.collection, button.dataset.edit);
       }
-      else if (button.dataset.add) openEditor(button.dataset.add);
+      else if (button.dataset.add) {
+        openEditor(button.dataset.add);
+        if (button.dataset.parent) form.elements.parent_id.value = button.dataset.parent;
+      }
       else if (button.dataset.source) readSource(button.dataset.source);
     }
   });
@@ -492,6 +602,13 @@ async function init() {
       record.id = editorContext.id || crypto.randomUUID();
       const records = state[editorContext.collection];
       const index = records.findIndex((item) => item.id === record.id);
+      if (editorContext.collection === "workstreams") {
+        if (record.workflow_type === "Umbrella") record.parent_id = "";
+        if (record.workflow_type !== "Umbrella" && state.workstreams.some((item) => item.parent_id === record.id)) {
+          showError("Move this umbrella's subprojects before converting it to a project.", "#editor-error");
+          return;
+        }
+      }
       if (editorContext.collection === "people" || editorContext.collection === "infrastructure") {
         const existing = records[index];
         if (editorContext.collection === "people") record.owner = existing ? existing.owner : "";
@@ -504,6 +621,11 @@ async function init() {
       else records[index] = record;
       $("#editor").close();
       markChanged();
+    });
+    form.elements.workflow_type.addEventListener("change", () => {
+      const umbrella = form.elements.workflow_type.value === "Umbrella";
+      if (umbrella) form.elements.parent_id.value = "";
+      form.elements.parent_id.disabled = umbrella;
     });
     form.elements.title.addEventListener("input", () => form.elements.title.setCustomValidity(""));
     for (const field of ["start", "due"]) form.elements.namedItem(field).addEventListener("input", () => form.elements.due.setCustomValidity(""));
@@ -522,6 +644,10 @@ async function init() {
     });
     $("#project-form").elements.title.addEventListener("input", () => $("#project-form").elements.title.setCustomValidity(""));
     $("#delete-record").addEventListener("click", () => {
+      if (editorContext.collection === "workstreams" && state.workstreams.some((item) => item.parent_id === editorContext.id)) {
+        showError("Move or delete this umbrella's subprojects before deleting the umbrella. No items were deleted.", "#editor-error");
+        return;
+      }
       if (!confirm("Delete this dashboard item? The original source files will not change.")) return;
       state[editorContext.collection] = state[editorContext.collection].filter((item) => item.id !== editorContext.id);
       $("#editor").close();
