@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "revision": 92,
-  "updated_at": "2026-11-11T08:00:44.108856+00:00",
+  "revision": 96,
+  "updated_at": "2026-11-25T07:42:57.735943+00:00",
   "project": {
     "title": "Redshift calibration task force",
     "summary": "Prepare robust Euclid DR1 redshift distributions and prior uncertainties for weak lensing, galaxy clustering and 2D mass mapping. Compare real data, Flagship2 and SHECAL; validate calibration-sample coverage, transfer functions and the shift-and-stretch uncertainty model.",
@@ -37,16 +37,17 @@
     },
     {
       "title": "Construct final FS2 DR1-like wide samples (WL & GC)",
+      "workflow_type": "Project",
+      "parent_id": "u-fs2",
       "owner": "Francisco Castander",
-      "status": "In progress",
+      "status": "Complete",
       "priority": "High",
       "due": "2026-11-13",
       "start": "2026-11-01",
       "evidence": "Reported",
       "source": "ou-phz-ztf_summary_6months.txt",
       "detail": "FS2_as_DR1 shear tomographic bins reproduce data N(z) and clustering amplitude well; position samples are less well matched. Investigate pruning high-z shear bins and finalise shape/position samples for validation.",
-      "id": "w-fswide",
-      "parent_id": "u-fs2"
+      "id": "w-fswide"
     },
     {
       "title": "Build realistic FS2 AUX / redshift mocks",
@@ -312,7 +313,7 @@
     {
       "title": "Compilation of redshift sample for first SGS Nz estimates (Nov Deadline)",
       "owner": "William Hartley, Angus Wright, Martine Campbell",
-      "status": "In progress",
+      "status": "Complete",
       "priority": "High",
       "due": "2026-11-13",
       "evidence": "User update",
@@ -323,7 +324,7 @@
     {
       "title": "Train final SGS Deep/AUX SOM(s)",
       "owner": "Will Hartley, zTFTz ",
-      "status": "Planned",
+      "status": "Complete",
       "priority": "Medium",
       "due": "2026-11-20",
       "evidence": "User update",
@@ -334,7 +335,7 @@
     {
       "title": "Train final SGS Wide SOM(s)",
       "owner": "",
-      "status": "Planned",
+      "status": "Complete",
       "priority": "Medium",
       "due": "2026-11-20",
       "evidence": "User update",
